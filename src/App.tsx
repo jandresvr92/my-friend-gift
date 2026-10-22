@@ -3,7 +3,6 @@ import {
   Volume2,
   VolumeX,
   RotateCcw,
-  Download,
 } from 'lucide-react';
 import { sound } from './game/audio';
 import {
@@ -180,29 +179,7 @@ export default function App() {
   };
 
   // Standalone index.html download
-  const handleDownloadStandalone = async () => {
-    try {
-      const response = await fetch('/minijuego.html');
-      let htmlText = '';
-      if (response.ok) {
-        htmlText = await response.text();
-      } else {
-        htmlText = '<!DOCTYPE html><html><body><h1>Juego Leslie</h1></body></html>';
-      }
 
-      const blob = new Blob([htmlText], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'juego_cumpleanos_leslie.html';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch {
-      window.open('/minijuego.html', '_blank');
-    }
-  };
 
   // Keyboard controls
   useEffect(() => {
@@ -311,6 +288,7 @@ export default function App() {
       if (p.y > lvl.pitY) {
         sound.playFall();
         loadLevel(g.level);
+        animId = requestAnimationFrame(gameLoop); // mantener vivo el bucle
         return;
       }
 
@@ -326,6 +304,7 @@ export default function App() {
           sound.playDoor();
           const nextLvl = g.level + 1;
           loadLevel(nextLvl);
+          animId = requestAnimationFrame(gameLoop); // mantener vivo el bucle
           return;
         }
       }
@@ -733,15 +712,6 @@ export default function App() {
               title="Reiniciar juego completo desde el Nivel 1 (Tecla R)"
             >
               <RotateCcw className="w-4 h-4 text-[#38bdf8]" />
-            </button>
-
-            {/* Standalone HTML Download Button */}
-            <button
-              onClick={handleDownloadStandalone}
-              className="p-2 rounded-xl bg-[#070a14] border border-slate-800 text-sky-400 hover:bg-slate-800 transition cursor-pointer"
-              title="Descargar index.html autónomo"
-            >
-              <Download className="w-4 h-4 text-sky-400" />
             </button>
           </div>
         </div>
