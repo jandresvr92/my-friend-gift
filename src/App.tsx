@@ -4,7 +4,6 @@ import {
   VolumeX,
   RotateCcw,
   Download,
-  Gamepad2,
 } from 'lucide-react';
 import { sound } from './game/audio';
 import {
@@ -40,12 +39,12 @@ interface LevelConfig {
 export default function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Playable Character & Level State
-  const selectedCharacter = 'dude';
+  // Playable Character is Pink Monster (Leslie)
+  const selectedCharacter: 'pink' = 'pink';
   const [currentLevel, setCurrentLevel] = useState<number>(1);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
-  // Virtual Canvas Dimensions
+  // Virtual Canvas Dimensions (16:9 internal resolution)
   const V_WIDTH = 800;
   const V_HEIGHT = 450;
 
@@ -76,7 +75,7 @@ export default function App() {
   // Game state ref
   const gameStateRef = useRef({
     level: 1,
-    characterId: 'dude' as 'dude' | 'pink' | 'owlet',
+    characterId: 'pink' as 'dude' | 'pink' | 'owlet',
     chestOpened: false,
     confetti: [] as ConfettiParticle[],
     messageAlpha: 0,
@@ -94,7 +93,7 @@ export default function App() {
       id: 1,
       title: 'NIVEL 1: TUTORIAL',
       subtitle: 'Aprende los controles básicos',
-      instruction: 'Usa Flechas para moverte y ESPACIO para saltar',
+      instruction: 'Usa Flechas / D-Pad para moverte y ESPACIO / SALTO para saltar',
       platforms: [
         { x: 40, y: 380, w: 720, h: 50, color: '#166534', type: 'ground' },
         { x: 300, y: 290, w: 150, h: 22, color: '#854d0e', type: 'floating' },
@@ -132,11 +131,9 @@ export default function App() {
     },
   };
 
-  // Determine the 2 NPC characters for Level 3 (the other two monsters!)
-  const allMonsters: ('dude' | 'pink' | 'owlet')[] = ['dude', 'pink', 'owlet'];
-  const npcCharacters = allMonsters.filter((m) => m !== selectedCharacter);
-  const npc1 = npcCharacters[0] || 'pink';
-  const npc2 = npcCharacters[1] || 'owlet';
+  // Determine the 2 NPC characters for Level 3 (Dude Monster & Owlet Monster)
+  const npc1: 'dude' = 'dude';
+  const npc2: 'owlet' = 'owlet';
 
   // Load level
   const loadLevel = (lvlId: number) => {
@@ -163,14 +160,14 @@ export default function App() {
   };
 
   // Spawn confetti explosion
-  const triggerConfettiExplosion = (count = 180) => {
+  const triggerConfettiExplosion = (count = 240) => {
     const newParticles: ConfettiParticle[] = [];
     for (let i = 0; i < count; i++) {
       const p = createConfettiParticle(V_WIDTH);
-      p.x = V_WIDTH / 2 + (Math.random() - 0.5) * 100;
+      p.x = V_WIDTH / 2 + (Math.random() - 0.5) * 120;
       p.y = 310;
-      p.vx = (Math.random() - 0.5) * 14;
-      p.vy = -6 - Math.random() * 10;
+      p.vx = (Math.random() - 0.5) * 15;
+      p.vy = -6 - Math.random() * 11;
       newParticles.push(p);
     }
     gameStateRef.current.confetti.push(...newParticles);
@@ -246,7 +243,6 @@ export default function App() {
     let animId: number;
 
     const gameLoop = () => {
-      // Schedule next frame unconditionally at the start so the loop never dies
       animId = requestAnimationFrame(gameLoop);
 
       const p = playerRef.current;
@@ -257,7 +253,7 @@ export default function App() {
       g.frameCounter++;
       p.animFrame++;
 
-      // 1. UPDATE HORIZONTAL MOVEMENT
+      // 1. HORIZONTAL MOVEMENT
       if (input.left && !input.right) {
         p.vx = -p.speed;
         p.facing = 'left';
@@ -268,14 +264,14 @@ export default function App() {
         p.vx = 0;
       }
 
-      // 2. UPDATE JUMPING
+      // 2. JUMPING
       if (input.jump && p.onGround) {
         p.vy = p.jumpForce;
         p.onGround = false;
         sound.playJump();
       }
 
-      // 3. APPLY GRAVITY & UPDATE POSITION
+      // 3. GRAVITY & POS
       p.vy += p.gravity;
       p.x += p.vx;
       p.y += p.vy;
@@ -344,10 +340,12 @@ export default function App() {
         ) {
           g.chestOpened = true;
           sound.playChestOpen();
+          // Trigger Celeste / Animal Crossing style procedural voice chatter!
+          sound.playVoiceChatter(16);
           setTimeout(() => {
             sound.playBirthdayMelody();
           }, 350);
-          triggerConfettiExplosion(220);
+          triggerConfettiExplosion(240);
         }
       }
 
@@ -477,9 +475,8 @@ export default function App() {
 
       // D. Level 3 Party Hall: Two Monster NPCs appear ONLY when treasure is reached!
       if (g.level === 3) {
-        // The last two characters are hidden until the player opens the treasure chest!
         if (g.chestOpened) {
-          // NPC 1: Left monster with balloons cheering and facing right towards chest!
+          // NPC 1 (Dude - blue): Left monster with balloons facing right towards chest!
           drawMonsterNPC(
             ctx,
             230,
@@ -494,7 +491,7 @@ export default function App() {
             'right'
           );
 
-          // NPC 2: Right monster with balloons cheering and facing left towards chest!
+          // NPC 2 (Owlet - grey): Right monster with balloons facing left towards chest!
           drawMonsterNPC(
             ctx,
             530,
@@ -524,7 +521,7 @@ export default function App() {
         }
       }
 
-      // E. Render Player Monster
+      // E. Render Player Monster (Leslie - Pink Monster)
       drawMonsterCharacter(
         ctx,
         p.x,
@@ -558,25 +555,40 @@ export default function App() {
         ctx.restore();
       }
 
-      // G. Dynamic Level HUD & In-game Instructions
+      // G. Dynamic In-game HUD with Pixel Art Typography
       ctx.textAlign = 'center';
       if (g.level === 1) {
+        // Pixel Art Tutorial Text
+        ctx.font = '10px "Press Start 2P", monospace';
+        ctx.fillStyle = '#050811';
+        ctx.fillText('Usa ◀ ▶ para moverte y ▲ / ESPACIO para saltar', V_WIDTH / 2 + 1, 61);
         ctx.fillStyle = '#f8fafc';
-        ctx.font = 'bold 15px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText(lvl.instruction, V_WIDTH / 2, 65);
+        ctx.fillText('Usa ◀ ▶ para moverte y ▲ / ESPACIO para saltar', V_WIDTH / 2, 60);
 
+        ctx.font = '8px "Press Start 2P", monospace';
+        ctx.fillStyle = '#050811';
+        ctx.fillText('▶ Llega a la puerta dorada de la derecha ▶', V_WIDTH / 2 + 1, 89);
         ctx.fillStyle = '#38bdf8';
-        ctx.font = '13px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('👉 Llega a la puerta de la derecha para avanzar al siguiente nivel', V_WIDTH / 2, 92);
+        ctx.fillText('▶ Llega a la puerta dorada de la derecha ▶', V_WIDTH / 2, 88);
       } else if (g.level === 2) {
-        ctx.fillStyle = '#f8fafc';
-        ctx.font = 'bold 15px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText(lvl.instruction, V_WIDTH / 2, 65);
+        ctx.font = '10px "Press Start 2P", monospace';
+        ctx.fillStyle = '#050811';
+        ctx.fillText('¡CUIDADO CON EL FOSO DE LAVA!', V_WIDTH / 2 + 1, 61);
+        ctx.fillStyle = '#f87171';
+        ctx.fillText('¡CUIDADO CON EL FOSO DE LAVA!', V_WIDTH / 2, 60);
+
+        ctx.font = '8px "Press Start 2P", monospace';
+        ctx.fillStyle = '#050811';
+        ctx.fillText('Salta con precision entre las 3 plataformas', V_WIDTH / 2 + 1, 85);
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillText('Salta con precision entre las 3 plataformas', V_WIDTH / 2, 84);
       } else if (g.level === 3) {
         if (!g.chestOpened) {
+          ctx.font = '11px "Press Start 2P", monospace';
+          ctx.fillStyle = '#050811';
+          ctx.fillText('¡TOCA EL COFRE DORADO EN EL CENTRO!', V_WIDTH / 2 + 1, 71);
           ctx.fillStyle = '#facc15';
-          ctx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
-          ctx.fillText('¡Toca el cofre dorado en el centro de la sala!', V_WIDTH / 2, 85);
+          ctx.fillText('¡TOCA EL COFRE DORADO EN EL CENTRO!', V_WIDTH / 2, 70);
 
           const bounce = Math.sin(g.frameCounter * 0.1) * 6;
           ctx.fillStyle = '#fbbf24';
@@ -587,26 +599,64 @@ export default function App() {
           ctx.closePath();
           ctx.fill();
         } else {
-          // CELEBRATION OVERLAY BANNER
+          // CELEBRATION OVERLAY BANNER FOR LESLIE (Wider & Personalized Card)
           ctx.save();
           ctx.globalAlpha = g.messageAlpha;
 
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+          const cardW = 690;
+          const cardH = 175;
+          const cardX = V_WIDTH / 2 - cardW / 2;
+          const cardY = 24;
+
+          // Card Background & Glowing Border
+          ctx.fillStyle = 'rgba(3, 7, 18, 0.95)';
           ctx.beginPath();
-          ctx.roundRect(V_WIDTH / 2 - 270, 40, 540, 115, 14);
+          ctx.roundRect(cardX, cardY, cardW, cardH, 14);
           ctx.fill();
 
-          ctx.strokeStyle = '#facc15';
-          ctx.lineWidth = 2.5;
+          ctx.strokeStyle = '#f59e0b';
+          ctx.lineWidth = 3;
           ctx.stroke();
 
-          ctx.fillStyle = '#facc15';
-          ctx.font = 'bold 26px "Press Start 2P", monospace';
-          ctx.fillText('¡FELIZ CUMPLEAÑOS!', V_WIDTH / 2, 90);
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(cardX + 4, cardY + 4, cardW - 8, cardH - 8);
 
-          ctx.fillStyle = '#38bdf8';
-          ctx.font = '600 15px "Plus Jakarta Sans", sans-serif';
-          ctx.fillText('🎉 ¡Que todos tus sueños y deseos se hagan realidad! 🎂', V_WIDTH / 2, 126);
+          // Card Title
+          ctx.fillStyle = '#fbbf24';
+          ctx.font = 'bold 17px "Press Start 2P", monospace';
+          ctx.fillText('¡FELIZ CUMPLEAÑOS LESLIE! 🎉', V_WIDTH / 2, cardY + 36);
+
+          // Personalized message lines
+          ctx.fillStyle = '#f8fafc';
+          ctx.font = '600 13px "Plus Jakarta Sans", sans-serif';
+          ctx.fillText(
+            'Leslie, otro nivel desbloqueado en esta aventura que es tu vida.',
+            V_WIDTH / 2,
+            cardY + 68
+          );
+          ctx.fillText(
+            'Te deseo lo mejor, gracias por ser tan buena amiga, nunca cambies tu forma de ser.',
+            V_WIDTH / 2,
+            cardY + 92
+          );
+
+          // Tiger Claw coupon badge
+          ctx.fillStyle = 'rgba(244, 63, 94, 0.2)';
+          ctx.beginPath();
+          ctx.roundRect(cardX + 28, cardY + 114, cardW - 56, 38, 8);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(244, 63, 94, 0.65)';
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+
+          ctx.fillStyle = '#fda4af';
+          ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+          ctx.fillText(
+            '🎟️ Nota: cupón válido para hacerle una garra del tigre al goldo <3',
+            V_WIDTH / 2,
+            cardY + 138
+          );
 
           ctx.restore();
         }
@@ -615,9 +665,9 @@ export default function App() {
 
     animId = requestAnimationFrame(gameLoop);
     return () => cancelAnimationFrame(animId);
-  }, [npc1, npc2]);
+  }, []);
 
-  // Touch control handlers
+  // Touch control handlers for gamepad
   const handleTouchStart = (key: 'left' | 'right' | 'jump') => (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
     if (soundEnabled) sound.setEnabled(true);
@@ -635,136 +685,149 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-2 sm:p-4 select-none">
-      {/* Top Discreet Header */}
-      <header className="w-full max-w-4xl flex items-center justify-between py-2 px-3 mb-2 bg-slate-900/80 border border-slate-800 rounded-xl backdrop-blur-md">
-        <div className="flex items-center gap-2.5">
-          <div className="p-1.5 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-400">
-            <Gamepad2 className="w-4 h-4" />
+    <div className="min-h-screen bg-neutral-950 text-slate-100 flex flex-col items-center justify-start sm:justify-center p-2 sm:p-4 select-none touch-none">
+      {/* Handheld Vertical Console Chassis */}
+      <div className="w-full max-w-md bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border-2 sm:border-4 border-slate-800 rounded-3xl p-3 sm:p-4 shadow-2xl flex flex-col gap-3">
+        
+        {/* Minimal Console Bezel Top Header */}
+        <div className="flex items-center justify-between px-1 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
+            <span className="font-['Press_Start_2P'] text-[9px] text-slate-400 tracking-wider">
+              RETRO BOY 2D
+            </span>
           </div>
-          <span className="text-sm font-bold text-white tracking-wide">
-            Plataformas Cumpleaños 2D
-          </span>
-        </div>
 
-        {/* Discreet Action Buttons */}
-        <div className="flex items-center gap-2">
-          {/* Sound Toggle */}
-          <button
-            onClick={toggleSound}
-            aria-label={soundEnabled ? 'Silenciar sonido' : 'Activar sonido'}
-            className={`px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-colors flex items-center gap-1.5 ${
-              soundEnabled
-                ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
-                : 'bg-rose-950/40 border-rose-900/50 text-rose-300'
-            }`}
-          >
-            {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-emerald-400" /> : <VolumeX className="w-3.5 h-3.5" />}
-            <span>{soundEnabled ? 'Sonido' : 'Silencio'}</span>
-          </button>
-
-          {/* Reset Current Level */}
-          <button
-            onClick={() => loadLevel(currentLevel)}
-            title="Reiniciar Nivel actual"
-            className="px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors flex items-center gap-1.5"
-          >
-            <RotateCcw className="w-3.5 h-3.5 text-sky-400" />
-            <span>Reiniciar</span>
-          </button>
-
-          {/* Download index.html */}
-          <button
-            onClick={handleDownloadStandalone}
-            title="Descargar minijuego en un solo archivo index.html"
-            className="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 border border-indigo-500 text-white text-xs font-semibold transition-all shadow flex items-center gap-1.5"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Descargar index.html</span>
-          </button>
-        </div>
-      </header>
-
-      {/* Main Game Arcade Screen */}
-      <main className="w-full max-w-4xl flex flex-col items-center">
-        {/* Game Canvas Container */}
-        <div className="relative w-full aspect-[16/9] bg-slate-900 border-2 border-slate-800 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center">
-          <canvas
-            ref={canvasRef}
-            width={V_WIDTH}
-            height={V_HEIGHT}
-            className="game-canvas w-full h-full block"
-          />
-
-          {/* Overlay Top Level Badge & Selector */}
-          <div className="absolute top-2.5 left-3 right-3 flex items-center justify-between pointer-events-none">
-            <div className="px-3 py-1 bg-slate-950/80 border border-slate-700/60 rounded-lg text-xs font-bold text-slate-200 backdrop-blur-sm shadow flex items-center gap-2">
-              <span className="text-amber-400">●</span>
-              <span>{levels[currentLevel]?.title || `NIVEL ${currentLevel}`}</span>
-            </div>
-
-            <div className="flex items-center gap-1 pointer-events-auto bg-slate-950/80 border border-slate-800/80 p-1 rounded-lg backdrop-blur-sm">
+          <div className="flex items-center gap-1.5">
+            {/* Level Quick Jump */}
+            <div className="flex items-center bg-slate-950 border border-slate-800 rounded-lg p-0.5">
               {[1, 2, 3].map((lvl) => (
                 <button
                   key={lvl}
                   onClick={() => loadLevel(lvl)}
-                  className={`px-2.5 py-0.5 rounded text-xs font-bold transition-all ${
+                  aria-label={`Ir al Nivel ${lvl}`}
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
                     currentLevel === lvl
-                      ? 'bg-rose-600 text-white shadow'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                      ? 'bg-rose-600 text-white shadow-sm'
+                      : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
-                  Nivel {lvl}
+                  L{lvl}
                 </button>
               ))}
             </div>
-          </div>
 
-          {/* Mobile On-Screen Virtual Touch Buttons */}
-          <div className="absolute bottom-2.5 left-3 right-3 flex items-end justify-between pointer-events-none z-10">
-            {/* D-Pad Horizontal Buttons */}
-            <div className="flex items-center gap-2 pointer-events-auto">
-              <button
-                onTouchStart={handleTouchStart('left')}
-                onTouchEnd={handleTouchEnd('left')}
-                onMouseDown={handleTouchStart('left')}
-                onMouseUp={handleTouchEnd('left')}
-                onMouseLeave={handleTouchEnd('left')}
-                className="touch-btn w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-800/85 hover:bg-slate-700 border-2 border-slate-600 active:bg-sky-500 active:border-sky-400 active:scale-95 text-white font-bold text-xl flex items-center justify-center backdrop-blur-md shadow-lg"
-                aria-label="Mover a la izquierda"
-              >
-                ◀
-              </button>
-              <button
-                onTouchStart={handleTouchStart('right')}
-                onTouchEnd={handleTouchEnd('right')}
-                onMouseDown={handleTouchStart('right')}
-                onMouseUp={handleTouchEnd('right')}
-                onMouseLeave={handleTouchEnd('right')}
-                className="touch-btn w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-800/85 hover:bg-slate-700 border-2 border-slate-600 active:bg-sky-500 active:border-sky-400 active:scale-95 text-white font-bold text-xl flex items-center justify-center backdrop-blur-md shadow-lg"
-                aria-label="Mover a la derecha"
-              >
-                ▶
-              </button>
-            </div>
+            {/* Sound Toggle */}
+            <button
+              onClick={toggleSound}
+              aria-label={soundEnabled ? 'Silenciar sonido' : 'Activar sonido'}
+              className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition"
+              title={soundEnabled ? 'Silenciar' : 'Activar sonido'}
+            >
+              {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-emerald-400" /> : <VolumeX className="w-3.5 h-3.5 text-rose-400" />}
+            </button>
 
-            {/* Jump Action Button */}
-            <div className="pointer-events-auto flex flex-col items-center gap-1">
-              <button
-                onTouchStart={handleTouchStart('jump')}
-                onTouchEnd={handleTouchEnd('jump')}
-                onMouseDown={handleTouchStart('jump')}
-                onMouseUp={handleTouchEnd('jump')}
-                onMouseLeave={handleTouchEnd('jump')}
-                className="touch-btn px-5 h-14 sm:h-16 rounded-2xl bg-emerald-600/90 hover:bg-emerald-500 border-2 border-emerald-400 active:bg-emerald-400 active:scale-95 text-white font-extrabold text-sm sm:text-base flex items-center justify-center backdrop-blur-md shadow-lg tracking-wide uppercase"
-                aria-label="Saltar"
-              >
-                ⬆ SALTO
-              </button>
-            </div>
+            {/* Restart Level */}
+            <button
+              onClick={() => loadLevel(currentLevel)}
+              className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition"
+              title="Reiniciar Nivel (Tecla R)"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-sky-400" />
+            </button>
           </div>
         </div>
-      </main>
+
+        {/* Dedicated Clean Screen (NO BUTTONS OVERLAYING THE CANVAS!) */}
+        <div className="relative w-full aspect-[16/9] bg-slate-950 border-2 border-slate-800/90 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center">
+          <canvas
+            ref={canvasRef}
+            width={V_WIDTH}
+            height={V_HEIGHT}
+            className="w-full h-full block"
+          />
+
+          {/* Level Badge in top-left of screen */}
+          <div className="absolute top-2 left-2 pointer-events-none">
+            <span className="px-2 py-0.5 bg-slate-950/80 border border-slate-700/60 rounded text-[9px] font-bold text-amber-400 font-['Press_Start_2P']">
+              LVL {currentLevel}
+            </span>
+          </div>
+        </div>
+
+        {/* Dedicated Bottom Retro Gamepad Controller */}
+        <div className="bg-slate-950/90 border border-slate-800 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2 shadow-lg">
+          {/* Left: Pixel Art D-Pad (◀ ▶) */}
+          <div className="flex items-center gap-2">
+            <button
+              onTouchStart={handleTouchStart('left')}
+              onTouchEnd={handleTouchEnd('left')}
+              onMouseDown={handleTouchStart('left')}
+              onMouseUp={handleTouchEnd('left')}
+              onMouseLeave={handleTouchEnd('left')}
+              aria-label="Mover a la izquierda"
+              className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border-2 border-slate-600 active:border-cyan-400 active:from-cyan-900 active:to-slate-900 active:scale-95 text-slate-200 active:text-cyan-300 font-bold text-2xl flex items-center justify-center shadow-lg transition-transform touch-manipulation select-none"
+            >
+              ◀
+            </button>
+
+            <button
+              onTouchStart={handleTouchStart('right')}
+              onTouchEnd={handleTouchEnd('right')}
+              onMouseDown={handleTouchStart('right')}
+              onMouseUp={handleTouchEnd('right')}
+              onMouseLeave={handleTouchEnd('right')}
+              aria-label="Mover a la derecha"
+              className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border-2 border-slate-600 active:border-cyan-400 active:from-cyan-900 active:to-slate-900 active:scale-95 text-slate-200 active:text-cyan-300 font-bold text-2xl flex items-center justify-center shadow-lg transition-transform touch-manipulation select-none"
+            >
+              ▶
+            </button>
+          </div>
+
+          {/* Center: Retro Console Accents */}
+          <div className="flex flex-col items-center justify-center gap-1.5 opacity-60">
+            <div className="flex gap-1">
+              <span className="w-1 h-5 bg-slate-700 rounded-full rotate-12" />
+              <span className="w-1 h-5 bg-slate-700 rounded-full rotate-12" />
+              <span className="w-1 h-5 bg-slate-700 rounded-full rotate-12" />
+            </div>
+            <span className="font-['Press_Start_2P'] text-[7px] text-slate-500 tracking-wider">
+              LESLIE
+            </span>
+          </div>
+
+          {/* Right: Retro Jump Action Button */}
+          <div className="flex flex-col items-center gap-1">
+            <button
+              onTouchStart={handleTouchStart('jump')}
+              onTouchEnd={handleTouchEnd('jump')}
+              onMouseDown={handleTouchStart('jump')}
+              onMouseUp={handleTouchEnd('jump')}
+              onMouseLeave={handleTouchEnd('jump')}
+              aria-label="Saltar"
+              className="w-20 h-16 sm:w-24 sm:h-18 rounded-2xl bg-gradient-to-b from-emerald-600 to-emerald-800 border-2 border-emerald-400 active:border-emerald-200 active:from-emerald-500 active:to-emerald-700 active:scale-95 text-white font-['Press_Start_2P'] text-[11px] flex flex-col items-center justify-center gap-1 shadow-lg shadow-emerald-950 transition-transform touch-manipulation select-none"
+            >
+              <span className="text-base leading-none">▲</span>
+              <span>SALTO</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Footer info & Download single-file button */}
+        <div className="flex items-center justify-between px-1 pt-1 text-[11px] text-slate-500">
+          <span>Controles: Flechas + Espacio</span>
+          <button
+            onClick={handleDownloadStandalone}
+            className="flex items-center gap-1 text-slate-400 hover:text-indigo-400 transition"
+            title="Descargar versión autónoma index.html"
+          >
+            <Download className="w-3 h-3" />
+            <span>Descargar index.html</span>
+          </button>
+        </div>
+
+      </div>
     </div>
   );
 }
+

@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Plataformas 2D - ¡Feliz Cumpleaños!</title>
+  <title>Plataformas 2D - ¡Feliz Cumpleaños Leslie!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -16,150 +19,296 @@
     body {
       background: #090d16;
       color: #f8fafc;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       min-height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden;
       touch-action: none;
-      padding: 12px;
+      padding: 12px 8px;
     }
-    #game-container {
+    @media (min-height: 700px) {
+      body {
+        justify-content: center;
+      }
+    }
+    .console-chassis {
       position: relative;
       width: 100%;
-      max-width: 840px;
+      max-width: 440px;
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
+      border: 3px solid #334155;
+      border-radius: 28px;
+      padding: 14px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .console-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+      font-size: 11px;
+    }
+    .console-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .power-led {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .brand-text {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: #94a3b8;
+      letter-spacing: 1px;
+    }
+    .console-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .lvl-btn-group {
+      display: flex;
+      background: #020617;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 2px;
+    }
+    .lvl-btn {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 7px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .lvl-btn.active {
+      background: #e11d48;
+      color: #ffffff;
+    }
+    .icon-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      padding: 4px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-btn:hover {
+      background: #334155;
+      color: #ffffff;
+    }
+    .screen-bezel {
+      position: relative;
+      width: 100%;
       aspect-ratio: 16 / 9;
-      background: #0f172a;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 2px #334155;
-      border-radius: 14px;
+      background: #020617;
+      border: 2px solid #1e293b;
+      border-radius: 16px;
       overflow: hidden;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.9);
     }
     canvas {
       width: 100%;
       height: 100%;
       display: block;
       image-rendering: pixelated;
-      image-rendering: crisp-edges;
     }
-    #top-hud {
+    .screen-badge {
       position: absolute;
-      top: 12px;
-      left: 14px;
-      right: 14px;
+      top: 8px;
+      left: 8px;
+      background: rgba(2, 6, 23, 0.85);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: #facc15;
+      padding: 3px 6px;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+    .gamepad-panel {
+      background: rgba(2, 6, 23, 0.9);
+      border: 1px solid #1e293b;
+      border-radius: 18px;
+      padding: 12px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      pointer-events: none;
-      font-size: 13px;
-      font-weight: 700;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-      z-index: 10;
-    }
-    .hud-badge {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(4px);
-      padding: 6px 12px;
-      border-radius: 8px;
-      pointer-events: auto;
-    }
-    .hud-btn {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      padding: 6px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      pointer-events: auto;
-      transition: all 0.15s;
-    }
-    .hud-btn:hover {
-      background: #334155;
-      transform: translateY(-1px);
-    }
-    #touch-controls {
-      position: absolute;
-      bottom: 12px;
-      left: 12px;
-      right: 12px;
-      display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-      pointer-events: none;
-      z-index: 20;
+      gap: 12px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
     }
     .dpad-container {
       display: flex;
-      gap: 12px;
-      pointer-events: auto;
+      gap: 8px;
     }
-    .touch-btn {
-      width: 60px;
-      height: 60px;
+    .pad-btn {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      border: 2px solid #475569;
       border-radius: 16px;
-      background: rgba(30, 41, 59, 0.85);
-      border: 2px solid rgba(255, 255, 255, 0.25);
-      color: #ffffff;
+      color: #e2e8f0;
       font-size: 24px;
       font-weight: bold;
       display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
       cursor: pointer;
-      transition: transform 0.08s, background 0.08s;
       touch-action: manipulation;
+      transition: transform 0.06s;
     }
-    .touch-btn:active, .touch-btn.active {
+    .pad-btn:active, .pad-btn.active {
       transform: scale(0.92);
-      background: rgba(56, 189, 248, 0.9);
       border-color: #38bdf8;
-      color: #0f172a;
+      background: linear-gradient(180deg, #0284c7 0%, #0f172a 100%);
+      color: #38bdf8;
     }
-    .action-container {
-      pointer-events: auto;
+    .console-middle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.6;
     }
-    .jump-btn {
-      width: 86px;
-      height: 60px;
-      font-size: 15px;
-      background: rgba(16, 185, 129, 0.85);
-      border-color: rgba(255, 255, 255, 0.35);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .speaker-slits {
+      display: flex;
+      gap: 4px;
     }
-    .jump-btn:active, .jump-btn.active {
-      background: #34d399;
-      color: #064e3b;
+    .slit {
+      width: 4px;
+      height: 20px;
+      background: #334155;
+      border-radius: 2px;
+      transform: rotate(15deg);
+    }
+    .console-name {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 6px;
+      color: #64748b;
+    }
+    .jump-btn-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .btn-jump {
+      width: 76px;
+      height: 64px;
+      background: linear-gradient(180deg, #059669 0%, #064e3b 100%);
+      border: 2px solid #34d399;
+      border-radius: 18px;
+      color: #ffffff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      box-shadow: 0 6px 14px rgba(6, 78, 59, 0.6);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.06s;
+    }
+    .btn-jump:active, .btn-jump.active {
+      transform: scale(0.92);
+      background: #10b981;
+      border-color: #6ee7b7;
+    }
+    .btn-jump .icon {
+      font-size: 14px;
+      line-height: 1;
+    }
+    .footer-help {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #64748b;
+      padding: 0 4px;
     }
   </style>
 </head>
 <body>
 
-  <div id="game-container">
-    <canvas id="gameCanvas" width="800" height="450"></canvas>
+  <div class="console-chassis">
+    <!-- Top Console Bezel -->
+    <div class="console-header">
+      <div class="console-brand">
+        <div class="power-led"></div>
+        <span class="brand-text">RETRO BOY 2D</span>
+      </div>
 
-    <div id="top-hud">
-      <div class="hud-badge" id="level-badge">NIVEL 1: TUTORIAL</div>
-      <div style="display:flex; gap:8px;">
-        <button class="hud-btn" id="sound-btn">🔊 Sonido</button>
-        <button class="hud-btn" id="restart-btn">↺ Reiniciar</button>
+      <div class="console-actions">
+        <div class="lvl-btn-group">
+          <button class="lvl-btn active" id="btn-lvl-1" onclick="setLevel(1)">L1</button>
+          <button class="lvl-btn" id="btn-lvl-2" onclick="setLevel(2)">L2</button>
+          <button class="lvl-btn" id="btn-lvl-3" onclick="setLevel(3)">L3</button>
+        </div>
+        <button class="icon-btn" id="sound-btn" title="Sonido">🔊</button>
+        <button class="icon-btn" id="restart-btn" title="Reiniciar nivel (Tecla R)">↺</button>
       </div>
     </div>
 
-    <div id="touch-controls">
+    <!-- Clean Dedicated Screen (Zero buttons overlaying!) -->
+    <div class="screen-bezel">
+      <canvas id="gameCanvas" width="800" height="450"></canvas>
+      <div class="screen-badge" id="screen-badge">LVL 1</div>
+    </div>
+
+    <!-- Dedicated Gamepad Console Below Screen -->
+    <div class="gamepad-panel">
+      <!-- Left: D-Pad -->
       <div class="dpad-container">
-        <button class="touch-btn" id="btn-left" aria-label="Izquierda">◀</button>
-        <button class="touch-btn" id="btn-right" aria-label="Derecha">▶</button>
+        <button class="pad-btn" id="btn-left" aria-label="Izquierda">◀</button>
+        <button class="pad-btn" id="btn-right" aria-label="Derecha">▶</button>
       </div>
-      <div class="action-container">
-        <button class="touch-btn jump-btn" id="btn-jump" aria-label="Saltar">⬆ SALTO</button>
+
+      <!-- Center: Speaker Slits -->
+      <div class="console-middle">
+        <div class="speaker-slits">
+          <div class="slit"></div>
+          <div class="slit"></div>
+          <div class="slit"></div>
+        </div>
+        <span class="console-name">LESLIE</span>
       </div>
+
+      <!-- Right: Jump Action Button -->
+      <div class="jump-btn-container">
+        <button class="btn-jump" id="btn-jump" aria-label="Saltar">
+          <span class="icon">▲</span>
+          <span>SALTO</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="footer-help">
+      <span>Controles: Flechas + Espacio</span>
+      <span>¡Feliz Cumpleaños Leslie!</span>
     </div>
   </div>
 
@@ -222,6 +371,39 @@
           osc.start(t);
           osc.stop(t + 0.13);
         });
+      } else if (type === 'chest') {
+        [261.63, 329.63, 392.0, 523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const t = now + idx * 0.06;
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.16, t);
+          gain.gain.exponentialRampToValueAtTime(0.01, t + (idx === 6 ? 0.6 : 0.15));
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + (idx === 6 ? 0.65 : 0.16));
+        });
+      } else if (type === 'voice') {
+        // Procedural 8-bit Celeste / Animal Crossing voice chatter
+        const baseFreqs = [480, 540, 620, 680, 760, 840];
+        for (let i = 0; i < 16; i++) {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const t = now + i * 0.055;
+          const duration = 0.045;
+          const freq = baseFreqs[Math.floor(Math.random() * baseFreqs.length)] + (Math.random() - 0.5) * 60;
+          osc.type = Math.random() > 0.4 ? 'square' : 'triangle';
+          osc.frequency.setValueAtTime(freq, t);
+          osc.frequency.exponentialRampToValueAtTime(freq * (0.92 + Math.random() * 0.22), t + duration);
+          gain.gain.setValueAtTime(0.11, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + duration + 0.01);
+        }
       } else if (type === 'birthday') {
         const notes = [
           { f: 392, d: 0.25 }, { f: 392, d: 0.25 }, { f: 440, d: 0.45 }, { f: 392, d: 0.45 }, { f: 523, d: 0.45 }, { f: 493, d: 0.8 },
@@ -269,6 +451,7 @@
 
     const keys = { left: false, right: false, jump: false };
 
+    // Playable character: Pink Monster (Leslie)
     const player = {
       x: 70,
       y: 330,
@@ -287,8 +470,6 @@
     function getLevelData(lvl) {
       if (lvl === 1) {
         return {
-          title: 'NIVEL 1: TUTORIAL',
-          instruction: 'Usa Flechas para moverte y ESPACIO para saltar',
           platforms: [
             { x: 40, y: 380, w: 720, h: 50, color: '#166534' },
             { x: 300, y: 290, w: 150, h: 22, color: '#854d0e' }
@@ -299,8 +480,6 @@
         };
       } else if (lvl === 2) {
         return {
-          title: 'NIVEL 2: DESAFÍO',
-          instruction: '¡Cuidado con el foso! Salta entre las 3 plataformas',
           platforms: [
             { x: 40, y: 360, w: 140, h: 24, color: '#15803d' },
             { x: 260, y: 280, w: 150, h: 24, color: '#15803d' },
@@ -313,8 +492,6 @@
         };
       } else {
         return {
-          title: 'NIVEL 3: ¡SORPRESA DE CUMPLEAÑOS!',
-          instruction: '¡Acércate y toca el cofre sorpresa!',
           platforms: [
             { x: 40, y: 380, w: 720, h: 50, color: '#78350f' }
           ],
@@ -335,22 +512,45 @@
       player.vx = 0;
       player.vy = 0;
       player.onGround = false;
-      if (lvl === 3) {
-        isChestOpened = false;
-        confetti = [];
-        messageAlpha = 0;
-      }
-      document.getElementById('level-badge').innerText = levelData.title;
+      isChestOpened = false;
+      confetti = [];
+      messageAlpha = 0;
+
+      document.getElementById('screen-badge').innerText = 'LVL ' + lvl;
+      [1, 2, 3].forEach(n => {
+        const btn = document.getElementById('btn-lvl-' + n);
+        if (btn) btn.classList.toggle('active', n === lvl);
+      });
     }
 
+    function spawnConfetti(count) {
+      const colors = ['#f43f5e', '#3b82f6', '#facc15', '#10b981', '#a855f7', '#fb923c', '#ffffff'];
+      for (let i = 0; i < count; i++) {
+        confetti.push({
+          x: CW / 2 + (Math.random() - 0.5) * 120,
+          y: 310,
+          vx: (Math.random() - 0.5) * 15,
+          vy: -6 - Math.random() * 11,
+          size: 6 + Math.random() * 7,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * Math.PI * 2,
+          vRot: (Math.random() - 0.5) * 0.25,
+          life: 0,
+          maxLife: 150 + Math.random() * 100
+        });
+      }
+    }
+
+    // Keyboard controls
     window.addEventListener('keydown', (e) => {
-      getAudioCtx();
+      if (soundEnabled) getAudioCtx();
       if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
       if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
       if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
         keys.jump = true;
         e.preventDefault();
       }
+      if (e.code === 'KeyR') setLevel(currentLevel);
     });
 
     window.addEventListener('keyup', (e) => {
@@ -359,80 +559,60 @@
       if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') keys.jump = false;
     });
 
-    const bindTouch = (elemId, keyProp) => {
-      const btn = document.getElementById(elemId);
-      const press = (e) => {
+    // Touch & Mouse Button binding
+    function bindTouch(id, keyName) {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      const start = (e) => {
         e.preventDefault();
-        getAudioCtx();
-        keys[keyProp] = true;
+        if (soundEnabled) getAudioCtx();
+        keys[keyName] = true;
         btn.classList.add('active');
+        if (navigator.vibrate) try { navigator.vibrate(12); } catch(err){}
       };
-      const release = (e) => {
+      const end = (e) => {
         e.preventDefault();
-        keys[keyProp] = false;
+        keys[keyName] = false;
         btn.classList.remove('active');
       };
-      btn.addEventListener('touchstart', press, { passive: false });
-      btn.addEventListener('touchend', release, { passive: false });
-      btn.addEventListener('touchcancel', release, { passive: false });
-      btn.addEventListener('mousedown', press);
-      btn.addEventListener('mouseup', release);
-      btn.addEventListener('mouseleave', release);
-    };
+      btn.addEventListener('touchstart', start, { passive: false });
+      btn.addEventListener('touchend', end, { passive: false });
+      btn.addEventListener('mousedown', start);
+      btn.addEventListener('mouseup', end);
+      btn.addEventListener('mouseleave', end);
+    }
 
     bindTouch('btn-left', 'left');
     bindTouch('btn-right', 'right');
     bindTouch('btn-jump', 'jump');
 
-    document.getElementById('sound-btn').onclick = () => {
+    document.getElementById('restart-btn').addEventListener('click', () => setLevel(currentLevel));
+    document.getElementById('sound-btn').addEventListener('click', () => {
       soundEnabled = !soundEnabled;
-      document.getElementById('sound-btn').innerText = soundEnabled ? '🔊 Sonido' : '🔇 Silencio';
-      if (soundEnabled) getAudioCtx();
-    };
+      document.getElementById('sound-btn').innerText = soundEnabled ? '🔊' : '🔇';
+    });
 
-    document.getElementById('restart-btn').onclick = () => {
-      setLevel(currentLevel);
-    };
-
-    function spawnConfetti(amount = 180) {
-      const colors = ['#f43f5e', '#ec4899', '#a855f7', '#3b82f6', '#06b6d4', '#10b981', '#facc15', '#fb923c'];
-      for (let i = 0; i < amount; i++) {
-        confetti.push({
-          x: CW / 2 + (Math.random() - 0.5) * 120,
-          y: 320,
-          vx: (Math.random() - 0.5) * 13,
-          vy: -6 - Math.random() * 9,
-          size: 6 + Math.random() * 6,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          rotation: Math.random() * Math.PI * 2,
-          vRot: (Math.random() - 0.5) * 0.2,
-          life: 0,
-          maxLife: 260 + Math.random() * 120
-        });
-      }
-    }
-
-    function drawMonster(x, y, w, h, id, facing, animState, frame) {
+    // Drawing functions
+    function drawMonster(x, y, w, h, id, facing, state, frame) {
       ctx.save();
-      const cx = x + w / 2;
-      const cy = y + h;
+      ctx.imageSmoothingEnabled = false;
 
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
       ctx.beginPath();
-      ctx.ellipse(cx, cy - 1, w * 0.45, 5, 0, 0, Math.PI * 2);
+      ctx.ellipse(x + w / 2, y + h - 1, w * 0.45, 5, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.translate(cx, cy);
+      ctx.translate(x + w / 2, y + h);
       if (facing === 'left') ctx.scale(-1, 1);
 
       let bobY = 0;
       let tilt = 0;
       let sx = 1, sy = 1;
 
-      if (animState === 'walk') {
+      if (state === 'walk') {
         bobY = -Math.abs(Math.sin(frame * 0.35)) * 4;
-        tilt = Math.sin(frame * 0.35) * 0.08;
-      } else if (animState === 'jump') {
+        tilt = Math.sin(frame * 0.35) * 0.09;
+      } else if (state === 'jump') {
         sx = 0.88;
         sy = 1.14;
         bobY = -2;
@@ -445,100 +625,109 @@
       ctx.rotate(tilt);
       ctx.scale(sx, sy);
 
-      const img = monsterImages[id] || monsterImages.dude;
-      if (img.complete) {
+      const img = monsterImages[id];
+      if (img && img.complete) {
         ctx.drawImage(img, -w / 2, -h, w, h);
+      } else {
+        ctx.fillStyle = id === 'pink' ? '#ec4899' : '#0284c7';
+        ctx.fillRect(-w / 2, -h, w, h);
       }
+
       ctx.restore();
     }
 
     function drawPartyNPC(x, y, w, h, id, frame, dialogue, facing) {
       ctx.save();
+      ctx.imageSmoothingEnabled = false;
+
       const cx = x + w / 2;
-      const cy = y + h;
+      const by = y + h;
 
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
       ctx.beginPath();
-      ctx.ellipse(cx, cy - 1, w * 0.45, 5, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, by - 1, w * 0.45, 5, 0, 0, Math.PI * 2);
       ctx.fill();
 
       const bounce = -Math.abs(Math.sin(frame * 0.25)) * 9;
-      ctx.translate(cx, cy + bounce);
+      ctx.translate(cx, by + bounce);
 
-      // Monster body with facing flip
       ctx.save();
-      if (facing === 'left') {
-        ctx.scale(-1, 1);
-      }
-      const img = monsterImages[id] || monsterImages.pink;
-      if (img.complete) {
+      if (facing === 'left') ctx.scale(-1, 1);
+      const img = monsterImages[id];
+      if (img && img.complete) {
         ctx.drawImage(img, -w / 2, -h, w, h);
       }
 
       // Party Cone Hat
-      ctx.fillStyle = id === 'pink' ? '#f43f5e' : '#8b5cf6';
+      ctx.fillStyle = id === 'dude' ? '#0ea5e9' : '#8b5cf6';
       ctx.beginPath();
       ctx.moveTo(-6, -h + 4);
       ctx.lineTo(6, -h + 4);
       ctx.lineTo(0, -h - 14);
       ctx.closePath();
       ctx.fill();
-
       ctx.fillStyle = '#facc15';
       ctx.beginPath();
-      ctx.arc(0, -h - 14, 3, 0, Math.PI * 2);
+      ctx.arc(0, -h - 15, 3.5, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
 
-      // Floating Balloons for both characters
-      const bx = (facing === 'left' ? 18 : -18) + Math.sin(frame * 0.06) * 4;
-      const by = -h - 38 + Math.cos(frame * 0.05) * 3;
+      // Floating Balloons
+      const balloonOffset = facing === 'left' ? 18 : -18;
+      const stringWiggle = Math.sin(frame * 0.06) * 4;
+      const bX = balloonOffset + stringWiggle;
+      const bY = -h - 38 + Math.cos(frame * 0.05) * 3;
 
-      ctx.strokeStyle = '#fff';
+      ctx.strokeStyle = 'rgba(255,255,255,0.7)';
       ctx.lineWidth = 1.2;
       ctx.beginPath();
       ctx.moveTo(facing === 'left' ? 8 : -8, -h + 12);
-      ctx.lineTo(bx, by + 8);
+      ctx.lineTo(bX, bY + 8);
       ctx.stroke();
 
       ctx.fillStyle = facing === 'left' ? '#06b6d4' : '#f43f5e';
       ctx.beginPath();
-      ctx.ellipse(bx - 6, by - 6, 8, 11, -0.1, 0, Math.PI * 2);
+      ctx.ellipse(bX - 6, bY - 6, 8, 11, -0.1, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.fillStyle = facing === 'left' ? '#a855f7' : '#facc15';
       ctx.beginPath();
-      ctx.ellipse(bx + 6, by - 12, 8, 11, 0.15, 0, Math.PI * 2);
+      ctx.ellipse(bX + 6, bY - 12, 8, 11, 0.15, 0, Math.PI * 2);
       ctx.fill();
 
-      // Spacious, perfectly aligned speech bubble
+      // Speech bubble
       if (dialogue) {
-        ctx.font = 'bold 12px sans-serif';
+        ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
         const textWidth = ctx.measureText(dialogue).width;
         const bw = Math.max(textWidth + 24, 82);
         const bh = 26;
-        const bX = -bw / 2;
-        const bY = -h - 44;
+        const bx = -bw / 2;
+        const byPos = -h - 44;
+
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.beginPath();
+        ctx.roundRect(bx + 1, byPos + 2, bw, bh, 8);
+        ctx.fill();
 
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.roundRect(bX, bY, bw, bh, 8);
+        ctx.roundRect(bx, byPos, bw, bh, 8);
         ctx.fill();
         ctx.strokeStyle = '#cbd5e1';
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(-4, bY + bh);
-        ctx.lineTo(4, bY + bh);
-        ctx.lineTo(0, bY + bh + 5);
+        ctx.moveTo(-4, byPos + bh);
+        ctx.lineTo(4, byPos + bh);
+        ctx.lineTo(0, byPos + bh + 5);
         ctx.closePath();
         ctx.fill();
 
         ctx.fillStyle = '#0f172a';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(dialogue, 0, bY + bh / 2);
+        ctx.fillText(dialogue, 0, byPos + bh / 2);
       }
 
       ctx.restore();
@@ -664,14 +853,14 @@
         player.animState = 'idle';
       }
 
-      // Check Pitfall (Nivel 2)
+      // Pitfall check (Level 2)
       if (player.y > levelData.pitY) {
         playSound('fall');
         setLevel(currentLevel);
         return;
       }
 
-      // Check Door Collision
+      // Door Collision (Levels 1 & 2)
       if (levelData.door) {
         const d = levelData.door;
         if (
@@ -686,7 +875,7 @@
         }
       }
 
-      // Check Chest Collision (Nivel 3 -> Revelar los otros dos personajes)
+      // Chest Collision (Level 3 - Reveal Dude and Owlet!)
       if (currentLevel === 3 && levelData.chest && !isChestOpened) {
         const c = levelData.chest;
         if (
@@ -696,20 +885,24 @@
           player.y < c.y + c.h
         ) {
           isChestOpened = true;
-          playSound('birthday');
-          spawnConfetti(180);
+          playSound('chest');
+          playSound('voice');
+          setTimeout(() => {
+            playSound('birthday');
+          }, 350);
+          spawnConfetti(240);
         }
       }
 
       for (let i = confetti.length - 1; i >= 0; i--) {
         const p = confetti[i];
-        p.vy += 0.12;
+        p.vy += 0.1;
         p.x += p.vx;
         p.y += p.vy;
         p.rotation += p.vRot;
         p.life++;
         if (p.life > p.maxLife || p.y > CH + 40) {
-          if (isChestOpened && Math.random() < 0.3) {
+          if (isChestOpened && Math.random() < 0.25) {
             p.y = -20;
             p.x = Math.random() * CW;
             p.vy = 2 + Math.random() * 3;
@@ -721,71 +914,92 @@
       }
 
       if (isChestOpened && messageAlpha < 1) {
-        messageAlpha += 0.03;
+        messageAlpha = Math.min(1, messageAlpha + 0.025);
       }
     }
 
     function render() {
-      ctx.fillStyle = currentLevel === 3 ? '#1e1b4b' : '#0f172a';
-      ctx.fillRect(0, 0, CW, CH);
+      ctx.clearRect(0, 0, CW, CH);
 
+      // Backgrounds
       if (currentLevel === 1) {
-        ctx.fillStyle = '#1e293b';
-        ctx.fillRect(0, 0, CW, 380);
-        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, CH);
+        bgGrad.addColorStop(0, '#0f172a');
+        bgGrad.addColorStop(0.7, '#1e293b');
+        bgGrad.addColorStop(1, '#090d16');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, CW, CH);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.06)';
         ctx.beginPath();
-        ctx.arc(150, 100, 45, 0, Math.PI * 2);
-        ctx.arc(190, 90, 55, 0, Math.PI * 2);
-        ctx.arc(230, 100, 40, 0, Math.PI * 2);
+        ctx.arc(140, 110, 50, 0, Math.PI * 2);
+        ctx.arc(180, 95, 60, 0, Math.PI * 2);
+        ctx.arc(230, 110, 45, 0, Math.PI * 2);
         ctx.fill();
       } else if (currentLevel === 2) {
-        const pitGradient = ctx.createLinearGradient(0, 390, 0, CH);
-        pitGradient.addColorStop(0, 'rgba(239, 68, 68, 0.4)');
-        pitGradient.addColorStop(1, 'rgba(185, 28, 28, 0.95)');
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, CH);
+        bgGrad.addColorStop(0, '#180d24');
+        bgGrad.addColorStop(0.7, '#2e1065');
+        bgGrad.addColorStop(1, '#450a0a');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, CW, CH);
+
+        const pitGradient = ctx.createLinearGradient(0, 385, 0, CH);
+        pitGradient.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
+        pitGradient.addColorStop(0.4, 'rgba(220, 38, 38, 0.7)');
+        pitGradient.addColorStop(1, '#7f1d1d');
         ctx.fillStyle = pitGradient;
-        ctx.fillRect(0, 390, CW, 60);
+        ctx.fillRect(0, 385, CW, CH - 385);
 
         ctx.fillStyle = '#ef4444';
-        for (let x = 10; x < CW; x += 30) {
+        for (let x = 10; x < CW; x += 28) {
           ctx.beginPath();
           ctx.moveTo(x, CH);
-          ctx.lineTo(x + 15, CH - 22);
-          ctx.lineTo(x + 30, CH);
+          ctx.lineTo(x + 14, CH - 26);
+          ctx.lineTo(x + 28, CH);
           ctx.fill();
         }
-      } else if (currentLevel === 3) {
-        const colors = ['#f43f5e', '#3b82f6', '#facc15', '#10b981', '#a855f7'];
-        for (let i = 0; i < 16; i++) {
+      } else {
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, CH);
+        bgGrad.addColorStop(0, '#1e1b4b');
+        bgGrad.addColorStop(0.6, '#312e81');
+        bgGrad.addColorStop(1, '#1e1136');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, CW, CH);
+
+        const colors = ['#f43f5e', '#3b82f6', '#facc15', '#10b981', '#a855f7', '#fb923c'];
+        for (let i = 0; i < 17; i++) {
+          const gx = 45 + i * 42;
+          const gy = 34 + Math.sin((i / 16) * Math.PI) * 12;
           ctx.fillStyle = colors[i % colors.length];
-          const gx = 40 + i * 45;
           ctx.beginPath();
-          ctx.moveTo(gx, 30);
-          ctx.lineTo(gx + 40, 30);
-          ctx.lineTo(gx + 20, 60);
+          ctx.moveTo(gx, gy);
+          ctx.lineTo(gx + 32, gy);
+          ctx.lineTo(gx + 16, gy + 28);
           ctx.closePath();
           ctx.fill();
         }
       }
 
+      // Platforms
       for (const plat of levelData.platforms) {
         ctx.fillStyle = plat.color;
         ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
-        ctx.fillStyle = 'rgba(255,255,255,0.2)';
+        ctx.fillStyle = 'rgba(255,255,255,0.22)';
         ctx.fillRect(plat.x, plat.y, plat.w, 4);
-        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillStyle = 'rgba(0,0,0,0.35)';
         ctx.fillRect(plat.x, plat.y + plat.h - 4, plat.w, 4);
       }
 
+      // Door (Levels 1 & 2)
       if (levelData.door) {
         drawDoor(levelData.door, animFrameCount);
       }
 
-      // LEVEL 3: Los dos últimos personajes SOLO se muestran al alcanzar el tesoro
+      // Level 3: Dude and Owlet appear ONLY upon touching chest!
       if (currentLevel === 3) {
         if (isChestOpened) {
-          // Left NPC facing right towards chest, with balloons
-          drawPartyNPC(230, 346, 32, 34, 'pink', animFrameCount, '¡Sorpresa!', 'right');
-          // Right NPC facing left towards chest, with balloons
+          drawPartyNPC(230, 346, 32, 34, 'dude', animFrameCount, '¡Sorpresa!', 'right');
           drawPartyNPC(530, 346, 32, 34, 'owlet', animFrameCount, '¡Feliz Cumple!', 'left');
         }
 
@@ -794,71 +1008,125 @@
         }
       }
 
-      // Draw Player Monster
+      // Draw Player Monster (Pink Monster - Leslie)
       drawMonster(
         player.x,
         player.y,
         player.w,
         player.h,
-        'dude',
+        'pink',
         player.facing,
         player.animState,
         animFrameCount
       );
 
-      // Draw Confetti
+      // Confetti
       for (const p of confetti) {
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.rotation);
         ctx.fillStyle = p.color;
-        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
         ctx.restore();
       }
 
+      // HUD & Instructions
       ctx.textAlign = 'center';
       if (currentLevel === 1) {
+        ctx.font = '10px "Press Start 2P", monospace';
+        ctx.fillStyle = '#050811';
+        ctx.fillText('Usa ◀ ▶ para moverte y ▲ / ESPACIO para saltar', CW / 2 + 1, 61);
         ctx.fillStyle = '#f8fafc';
-        ctx.font = 'bold 16px -apple-system, sans-serif';
-        ctx.fillText(levelData.instruction, CW / 2, 70);
+        ctx.fillText('Usa ◀ ▶ para moverte y ▲ / ESPACIO para saltar', CW / 2, 60);
 
+        ctx.font = '8px "Press Start 2P", monospace';
+        ctx.fillStyle = '#050811';
+        ctx.fillText('▶ Llega a la puerta dorada de la derecha ▶', CW / 2 + 1, 89);
         ctx.fillStyle = '#38bdf8';
-        ctx.font = '13px -apple-system, sans-serif';
-        ctx.fillText('👉 Avanza hacia la derecha para entrar por la puerta', CW / 2, 100);
+        ctx.fillText('▶ Llega a la puerta dorada de la derecha ▶', CW / 2, 88);
       } else if (currentLevel === 2) {
-        ctx.fillStyle = '#f8fafc';
-        ctx.font = 'bold 16px -apple-system, sans-serif';
-        ctx.fillText(levelData.instruction, CW / 2, 70);
+        ctx.font = '10px "Press Start 2P", monospace';
+        ctx.fillStyle = '#050811';
+        ctx.fillText('¡CUIDADO CON EL FOSO DE LAVA!', CW / 2 + 1, 61);
+        ctx.fillStyle = '#f87171';
+        ctx.fillText('¡CUIDADO CON EL FOSO DE LAVA!', CW / 2, 60);
+
+        ctx.font = '8px "Press Start 2P", monospace';
+        ctx.fillStyle = '#050811';
+        ctx.fillText('Salta con precision entre las 3 plataformas', CW / 2 + 1, 85);
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillText('Salta con precision entre las 3 plataformas', CW / 2, 84);
       } else if (currentLevel === 3) {
         if (!isChestOpened) {
+          ctx.font = '11px "Press Start 2P", monospace';
+          ctx.fillStyle = '#050811';
+          ctx.fillText('¡TOCA EL COFRE DORADO EN EL CENTRO!', CW / 2 + 1, 71);
           ctx.fillStyle = '#facc15';
-          ctx.font = 'bold 16px -apple-system, sans-serif';
-          ctx.fillText('¡Toca el cofre dorado en el centro!', CW / 2, 100);
+          ctx.fillText('¡TOCA EL COFRE DORADO EN EL CENTRO!', CW / 2, 70);
 
           const bounce = Math.sin(animFrameCount * 0.1) * 6;
           ctx.fillStyle = '#fbbf24';
           ctx.beginPath();
-          ctx.moveTo(CW / 2, 290 + bounce);
-          ctx.lineTo(CW / 2 - 12, 275 + bounce);
-          ctx.lineTo(CW / 2 + 12, 275 + bounce);
+          ctx.moveTo(CW / 2, 285 + bounce);
+          ctx.lineTo(CW / 2 - 12, 270 + bounce);
+          ctx.lineTo(CW / 2 + 12, 270 + bounce);
+          ctx.closePath();
           ctx.fill();
         } else {
+          // CELEBRATION OVERLAY BANNER FOR LESLIE
           ctx.save();
           ctx.globalAlpha = messageAlpha;
 
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
-          ctx.fillRect(CW / 2 - 280, 50, 560, 110);
-          ctx.strokeStyle = '#facc15';
+          const cardW = 690;
+          const cardH = 175;
+          const cardX = CW / 2 - cardW / 2;
+          const cardY = 24;
+
+          ctx.fillStyle = 'rgba(3, 7, 18, 0.95)';
+          ctx.beginPath();
+          ctx.roundRect(cardX, cardY, cardW, cardH, 14);
+          ctx.fill();
+
+          ctx.strokeStyle = '#f59e0b';
           ctx.lineWidth = 3;
-          ctx.strokeRect(CW / 2 - 280, 50, 560, 110);
+          ctx.stroke();
 
-          ctx.fillStyle = '#facc15';
-          ctx.font = '900 36px -apple-system, sans-serif';
-          ctx.fillText('🎉 ¡FELIZ CUMPLEAÑOS! 🎂', CW / 2, 105);
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(cardX + 4, cardY + 4, cardW - 8, cardH - 8);
 
-          ctx.fillStyle = '#38bdf8';
-          ctx.font = 'bold 16px -apple-system, sans-serif';
-          ctx.fillText('¡Felicidades en tu día especial! Que lo pases genial', CW / 2, 138);
+          ctx.fillStyle = '#fbbf24';
+          ctx.font = 'bold 17px "Press Start 2P", monospace';
+          ctx.fillText('¡FELIZ CUMPLEAÑOS LESLIE! 🎉', CW / 2, cardY + 36);
+
+          ctx.fillStyle = '#f8fafc';
+          ctx.font = '600 13px "Plus Jakarta Sans", sans-serif';
+          ctx.fillText(
+            'Leslie, otro nivel desbloqueado en esta aventura que es tu vida.',
+            CW / 2,
+            cardY + 68
+          );
+          ctx.fillText(
+            'Te deseo lo mejor, gracias por ser tan buena amiga, nunca cambies tu forma de ser.',
+            CW / 2,
+            cardY + 92
+          );
+
+          ctx.fillStyle = 'rgba(244, 63, 94, 0.2)';
+          ctx.beginPath();
+          ctx.roundRect(cardX + 28, cardY + 114, cardW - 56, 38, 8);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(244, 63, 94, 0.65)';
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+
+          ctx.fillStyle = '#fda4af';
+          ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+          ctx.fillText(
+            '🎟️ Nota: cupón válido para hacerle una garra del tigre al goldo <3',
+            CW / 2,
+            cardY + 138
+          );
 
           ctx.restore();
         }

@@ -197,6 +197,41 @@ class SoundEngine {
       });
     } catch {}
   }
+
+  public playVoiceChatter(count = 14) {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      // Synthesize Animal Crossing / Celeste style phonetic chirps with randomized pitch intervals
+      const baseFreqs = [480, 540, 620, 680, 760, 840];
+      for (let i = 0; i < count; i++) {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        const t = now + i * 0.055;
+        const duration = 0.045;
+        const freq = baseFreqs[Math.floor(Math.random() * baseFreqs.length)] + (Math.random() - 0.5) * 60;
+
+        osc.type = Math.random() > 0.4 ? 'square' : 'triangle';
+        osc.frequency.setValueAtTime(freq, t);
+        // Micro-pitch slide characteristic of Animalese speech
+        osc.frequency.exponentialRampToValueAtTime(freq * (0.92 + Math.random() * 0.22), t + duration);
+
+        gain.gain.setValueAtTime(0.12, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(t);
+        osc.stop(t + duration + 0.01);
+      }
+    } catch {}
+  }
 }
 
 export const sound = new SoundEngine();
