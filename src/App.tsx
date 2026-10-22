@@ -4,15 +4,9 @@ import {
   VolumeX,
   RotateCcw,
   Download,
-  Copy,
-  Check,
-  Sparkles,
   Gamepad2,
-  ExternalLink,
-  Users,
 } from 'lucide-react';
 import { sound } from './game/audio';
-import { MONSTERS } from './game/characterAssets';
 import {
   drawMonsterCharacter,
   drawMonsterNPC,
@@ -46,14 +40,10 @@ interface LevelConfig {
 export default function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Character selection: dude | pink | owlet
-  const [selectedCharacter, setSelectedCharacter] = useState<'dude' | 'pink' | 'owlet'>('dude');
+  // Playable Character & Level State
+  const selectedCharacter = 'dude';
   const [currentLevel, setCurrentLevel] = useState<number>(1);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
-  const [showCharModal, setShowCharModal] = useState<boolean>(false);
-  const [showCodeModal, setShowCodeModal] = useState<boolean>(false);
-  const [copiedCode, setCopiedCode] = useState<boolean>(false);
-  const [isVictoryCelebration, setIsVictoryCelebration] = useState<boolean>(false);
 
   // Virtual Canvas Dimensions
   const V_WIDTH = 800;
@@ -163,7 +153,6 @@ export default function App() {
     playerRef.current.onGround = false;
 
     setCurrentLevel(lvl.id);
-    setIsVictoryCelebration(false);
   };
 
   // Sound toggle
@@ -204,18 +193,6 @@ export default function App() {
       })
       .catch(() => {
         window.open('/minijuego.html', '_blank');
-      });
-  };
-
-  // Copy code to clipboard
-  const handleCopyCode = () => {
-    fetch('/minijuego.html')
-      .then((res) => res.text())
-      .then((content) => {
-        navigator.clipboard.writeText(content).then(() => {
-          setCopiedCode(true);
-          setTimeout(() => setCopiedCode(false), 2500);
-        });
       });
   };
 
@@ -269,6 +246,9 @@ export default function App() {
     let animId: number;
 
     const gameLoop = () => {
+      // Schedule next frame unconditionally at the start so the loop never dies
+      animId = requestAnimationFrame(gameLoop);
+
       const p = playerRef.current;
       const g = gameStateRef.current;
       const input = inputRef.current;
@@ -337,7 +317,7 @@ export default function App() {
         return;
       }
 
-      // 8. DOOR COLLISION (Levels 1 & 2)
+      // 8. DOOR COLLISION (Levels 1 & 2 -> Advance to next level seamlessly)
       if (lvl.door) {
         const d = lvl.door;
         if (
@@ -347,12 +327,13 @@ export default function App() {
           p.y < d.y + d.h
         ) {
           sound.playDoor();
-          loadLevel(g.level + 1);
+          const nextLvl = g.level + 1;
+          loadLevel(nextLvl);
           return;
         }
       }
 
-      // 9. CHEST COLLISION (Level 3)
+      // 9. CHEST COLLISION (Level 3 - Treasure reached!)
       if (g.level === 3 && lvl.chest && !g.chestOpened) {
         const c = lvl.chest;
         if (
@@ -362,7 +343,6 @@ export default function App() {
           p.y < c.y + c.h
         ) {
           g.chestOpened = true;
-          setIsVictoryCelebration(true);
           sound.playChestOpen();
           setTimeout(() => {
             sound.playBirthdayMelody();
@@ -495,37 +475,40 @@ export default function App() {
         drawDoor(ctx, lvl.door.x, lvl.door.y, lvl.door.w, lvl.door.h, g.frameCounter);
       }
 
-      // D. Level 3 Party Hall: Two Static Monster NPCs & Birthday Chest
+      // D. Level 3 Party Hall: Two Monster NPCs appear ONLY when treasure is reached!
       if (g.level === 3) {
-        // NPC 1: Left monster with balloons
-        const dialogue1 = g.chestOpened ? '¡Hurra!' : '¡Sorpresa!';
-        drawMonsterNPC(
-          ctx,
-          230,
-          346,
-          32,
-          34,
-          npc1,
-          g.frameCounter,
-          dialogue1,
-          true,
-          g.chestOpened
-        );
+        // The last two characters are hidden until the player opens the treasure chest!
+        if (g.chestOpened) {
+          // NPC 1: Left monster with balloons cheering and facing right towards chest!
+          drawMonsterNPC(
+            ctx,
+            230,
+            346,
+            32,
+            34,
+            npc1,
+            g.frameCounter,
+            '¡Sorpresa!',
+            true,
+            true,
+            'right'
+          );
 
-        // NPC 2: Right monster cheering
-        const dialogue2 = g.chestOpened ? '¡Feliz Cumple!' : '¡Abre el cofre!';
-        drawMonsterNPC(
-          ctx,
-          530,
-          346,
-          32,
-          34,
-          npc2,
-          g.frameCounter,
-          dialogue2,
-          false,
-          g.chestOpened
-        );
+          // NPC 2: Right monster with balloons cheering and facing left towards chest!
+          drawMonsterNPC(
+            ctx,
+            530,
+            346,
+            32,
+            34,
+            npc2,
+            g.frameCounter,
+            '¡Feliz Cumple!',
+            true,
+            true,
+            'left'
+          );
+        }
 
         // Birthday Chest
         if (lvl.chest) {
@@ -628,8 +611,6 @@ export default function App() {
           ctx.restore();
         }
       }
-
-      animId = requestAnimationFrame(gameLoop);
     };
 
     animId = requestAnimationFrame(gameLoop);
@@ -654,80 +635,58 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-between p-2 sm:p-4 select-none">
-      {/* Top Header & Toolbar */}
-      <header className="w-full max-w-4xl flex flex-wrap items-center justify-between gap-2 py-2 px-3 bg-slate-900/80 border border-slate-800 rounded-xl backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-400">
-            <Gamepad2 className="w-5 h-5" />
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-2 sm:p-4 select-none">
+      {/* Top Discreet Header */}
+      <header className="w-full max-w-4xl flex items-center justify-between py-2 px-3 mb-2 bg-slate-900/80 border border-slate-800 rounded-xl backdrop-blur-md">
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-400">
+            <Gamepad2 className="w-4 h-4" />
           </div>
-          <div>
-            <h1 className="text-sm sm:text-base font-bold text-white tracking-wide">
-              Plataformas Cumpleaños 2D
-            </h1>
-            <div className="flex items-center gap-2 text-xs text-slate-400">
-              <span className="text-emerald-400 font-medium">Dude, Pink & Owlet</span>
-              <span>·</span>
-              <span>Canvas 60 FPS</span>
-              <span>·</span>
-              <span>3 Niveles</span>
-            </div>
-          </div>
+          <span className="text-sm font-bold text-white tracking-wide">
+            Plataformas Cumpleaños 2D
+          </span>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Character Switcher Button */}
-          <button
-            onClick={() => setShowCharModal(true)}
-            className="p-2 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors flex items-center gap-1.5 shadow"
-          >
-            <img
-              src={MONSTERS[selectedCharacter].dataUri}
-              alt={MONSTERS[selectedCharacter].name}
-              className="w-5 h-5 object-contain"
-            />
-            <span className="hidden sm:inline">{MONSTERS[selectedCharacter].name}</span>
-          </button>
-
+        {/* Discreet Action Buttons */}
+        <div className="flex items-center gap-2">
           {/* Sound Toggle */}
           <button
             onClick={toggleSound}
             aria-label={soundEnabled ? 'Silenciar sonido' : 'Activar sonido'}
-            className={`p-2 rounded-lg border text-xs font-medium transition-colors flex items-center gap-1.5 ${
+            className={`px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-colors flex items-center gap-1.5 ${
               soundEnabled
                 ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
                 : 'bg-rose-950/40 border-rose-900/50 text-rose-300'
             }`}
           >
-            {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4" />}
-            <span className="hidden sm:inline">{soundEnabled ? 'Sonido' : 'Mute'}</span>
+            {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-emerald-400" /> : <VolumeX className="w-3.5 h-3.5" />}
+            <span>{soundEnabled ? 'Sonido' : 'Silencio'}</span>
           </button>
 
           {/* Reset Current Level */}
           <button
             onClick={() => loadLevel(currentLevel)}
             title="Reiniciar Nivel actual"
-            className="p-2 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors flex items-center gap-1.5"
+            className="px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors flex items-center gap-1.5"
           >
-            <RotateCcw className="w-4 h-4 text-sky-400" />
-            <span className="hidden sm:inline">Reiniciar</span>
+            <RotateCcw className="w-3.5 h-3.5 text-sky-400" />
+            <span>Reiniciar</span>
           </button>
 
           {/* Download index.html */}
           <button
             onClick={handleDownloadStandalone}
             title="Descargar minijuego en un solo archivo index.html"
-            className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 border border-indigo-500 text-white text-xs font-semibold transition-all shadow-md flex items-center gap-1.5"
+            className="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 border border-indigo-500 text-white text-xs font-semibold transition-all shadow flex items-center gap-1.5"
           >
-            <Download className="w-4 h-4" />
-            <span>Descargar index.html</span>
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Descargar index.html</span>
           </button>
         </div>
       </header>
 
-      {/* Main Game Screen Card */}
-      <main className="w-full max-w-4xl my-2 flex flex-col items-center">
+      {/* Main Game Arcade Screen */}
+      <main className="w-full max-w-4xl flex flex-col items-center">
         {/* Game Canvas Container */}
         <div className="relative w-full aspect-[16/9] bg-slate-900 border-2 border-slate-800 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center">
           <canvas
@@ -737,14 +696,13 @@ export default function App() {
             className="game-canvas w-full h-full block"
           />
 
-          {/* Overlay Top Badge */}
+          {/* Overlay Top Level Badge & Selector */}
           <div className="absolute top-2.5 left-3 right-3 flex items-center justify-between pointer-events-none">
             <div className="px-3 py-1 bg-slate-950/80 border border-slate-700/60 rounded-lg text-xs font-bold text-slate-200 backdrop-blur-sm shadow flex items-center gap-2">
               <span className="text-amber-400">●</span>
               <span>{levels[currentLevel]?.title || `NIVEL ${currentLevel}`}</span>
             </div>
 
-            {/* Quick Level Switcher */}
             <div className="flex items-center gap-1 pointer-events-auto bg-slate-950/80 border border-slate-800/80 p-1 rounded-lg backdrop-blur-sm">
               {[1, 2, 3].map((lvl) => (
                 <button
@@ -806,226 +764,7 @@ export default function App() {
             </div>
           </div>
         </div>
-
-        {/* Celebration Action Bar when Level 3 is completed */}
-        {isVictoryCelebration && (
-          <div className="w-full mt-3 p-3 bg-indigo-950/70 border border-indigo-700/60 rounded-xl flex flex-wrap items-center justify-between gap-3 shadow-lg">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-amber-300 animate-spin" />
-              <span className="text-sm font-bold text-amber-200">
-                ¡Sorpresa descubierta! ¡Tus amigos te celebran en grande!
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => triggerConfettiExplosion(150)}
-                className="px-3 py-1.5 bg-pink-600 hover:bg-pink-500 rounded-lg text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shadow"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Más Confeti</span>
-              </button>
-              <button
-                onClick={() => loadLevel(1)}
-                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-white text-xs font-semibold transition-colors"
-              >
-                Volver a Jugar
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Character Roster Overview */}
-        <div className="w-full mt-3 p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-rose-400" />
-            <span className="font-semibold text-slate-300">Personajes del juego:</span>
-          </div>
-          <div className="flex items-center gap-3">
-            {(['dude', 'pink', 'owlet'] as const).map((mId) => {
-              const m = MONSTERS[mId];
-              const isSelected = selectedCharacter === mId;
-              return (
-                <button
-                  key={mId}
-                  onClick={() => setSelectedCharacter(mId)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-all ${
-                    isSelected
-                      ? 'bg-rose-500/20 border-rose-500 text-white font-bold shadow'
-                      : 'bg-slate-800/40 border-slate-700 text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <img src={m.dataUri} alt={m.name} className="w-4 h-4 object-contain" />
-                  <span>{m.name}</span>
-                  {isSelected && <span className="text-[10px] text-rose-300">(Tú)</span>}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Controls Guide */}
-        <div className="w-full mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-slate-400">
-          <div className="p-2.5 bg-slate-900/60 border border-slate-800 rounded-lg">
-            <span className="font-semibold text-slate-200 block mb-1">🎮 Teclado:</span>
-            <span>Usa <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300">◀</kbd> <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300">▶</kbd> o <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300">A</kbd> <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300">D</kbd> para correr.</span>
-          </div>
-          <div className="p-2.5 bg-slate-900/60 border border-slate-800 rounded-lg">
-            <span className="font-semibold text-slate-200 block mb-1">🦘 Salto:</span>
-            <span>Presiona <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300">ESPACIO</kbd> o <kbd className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300">⬆</kbd> para saltar plataformas.</span>
-          </div>
-          <div className="p-2.5 bg-slate-900/60 border border-slate-800 rounded-lg">
-            <span className="font-semibold text-slate-200 block mb-1">📱 Celular & Móvil:</span>
-            <span>Usa los botones táctiles en pantalla (multitáctil activo).</span>
-          </div>
-        </div>
       </main>
-
-      {/* Footer Info */}
-      <footer className="w-full max-w-4xl py-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 border-t border-slate-900">
-        <div className="flex items-center gap-2">
-          <span>Minijuego en un solo archivo index.html (Vanilla JS + HTML5 Canvas)</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowCodeModal(true)}
-            className="hover:text-slate-300 transition-colors flex items-center gap-1 underline underline-offset-4"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            <span>Ver código autónomo</span>
-          </button>
-          <span>·</span>
-          <button
-            onClick={handleCopyCode}
-            className="hover:text-slate-300 transition-colors flex items-center gap-1"
-          >
-            {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copiedCode ? '¡Copiado!' : 'Copiar código HTML'}</span>
-          </button>
-        </div>
-      </footer>
-
-      {/* MODAL: CHOOSE CHARACTER */}
-      {showCharModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-amber-400" />
-                <h2 className="text-base font-bold text-white">Elige tu Personaje</h2>
-              </div>
-              <button
-                onClick={() => setShowCharModal(false)}
-                className="text-slate-400 hover:text-white text-lg font-bold"
-              >
-                ✕
-              </button>
-            </div>
-
-            <p className="text-xs text-slate-400">
-              Selecciona con cuál de los 3 monstruos jugar. Los otros dos te estarán esperando en el Nivel 3 con gorros de fiesta y globos para celebrar tu cumpleaños:
-            </p>
-
-            {/* Character Cards */}
-            <div className="space-y-2">
-              {(['dude', 'pink', 'owlet'] as const).map((mId) => {
-                const m = MONSTERS[mId];
-                const isSelected = selectedCharacter === mId;
-                return (
-                  <button
-                    key={mId}
-                    onClick={() => {
-                      setSelectedCharacter(mId);
-                      setShowCharModal(false);
-                    }}
-                    className={`w-full p-3 rounded-xl border flex items-center justify-between transition-all ${
-                      isSelected
-                        ? 'bg-rose-500/15 border-rose-500 text-white shadow-lg'
-                        : 'bg-slate-800/60 border-slate-700/60 text-slate-300 hover:bg-slate-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-slate-950/60 rounded-lg flex items-center justify-center p-1 border border-slate-800">
-                        <img src={m.dataUri} alt={m.name} className="w-8 h-8 object-contain" />
-                      </div>
-                      <div className="text-left">
-                        <p className="text-sm font-bold text-white">{m.name}</p>
-                        <p className="text-xs text-slate-400">{m.roleDescription}</p>
-                      </div>
-                    </div>
-                    {isSelected && (
-                      <span className="text-xs font-semibold px-2 py-0.5 bg-rose-500 text-white rounded-md">
-                        Seleccionado
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={() => setShowCharModal(false)}
-              className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl text-xs transition-colors"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: VIEW STANDALONE HTML SOURCE CODE */}
-      {showCodeModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col max-h-[85vh]">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div>
-                <h2 className="text-base font-bold text-white">
-                  Archivo Único index.html Autónomo
-                </h2>
-                <p className="text-xs text-slate-400">
-                  Todo el juego en un solo archivo HTML autónomo (con Dude Monster, Pink Monster y Owlet Monster integrados).
-                </p>
-              </div>
-              <button
-                onClick={() => setShowCodeModal(false)}
-                className="text-slate-400 hover:text-white text-lg font-bold"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="my-3 flex-1 overflow-auto bg-slate-950 border border-slate-800 p-3 rounded-xl font-mono text-[11px] text-slate-300 leading-relaxed select-text">
-              <pre>
-{`<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Plataformas 2D - ¡Feliz Cumpleaños!</title>
-  <!-- Contiene los 3 personajes incrustados en Base64, física Canvas 60 FPS,
-       sonidos 8-bits sintetizados, 3 niveles, foso, NPCs y confeti -->
-</head>
-...`}
-              </pre>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
-              <button
-                onClick={handleCopyCode}
-                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-white text-xs font-semibold flex items-center gap-1.5"
-              >
-                {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedCode ? '¡Copiado!' : 'Copiar todo el código'}</span>
-              </button>
-              <button
-                onClick={handleDownloadStandalone}
-                className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 rounded-lg text-white text-xs font-semibold flex items-center gap-1.5"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Descargar archivo index.html</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -24,6 +24,7 @@
       min-height: 100vh;
       overflow: hidden;
       touch-action: none;
+      padding: 12px;
     }
     #game-container {
       position: relative;
@@ -32,7 +33,7 @@
       aspect-ratio: 16 / 9;
       background: #0f172a;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 2px #334155;
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
     }
     canvas {
@@ -42,7 +43,6 @@
       image-rendering: pixelated;
       image-rendering: crisp-edges;
     }
-    /* Top Bar HUD */
     #top-hud {
       position: absolute;
       top: 12px;
@@ -55,9 +55,10 @@
       font-size: 13px;
       font-weight: 700;
       text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      z-index: 10;
     }
     .hud-badge {
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(4px);
       padding: 6px 12px;
@@ -80,7 +81,6 @@
       background: #334155;
       transform: translateY(-1px);
     }
-    /* Virtual Mobile Touch Controls */
     #touch-controls {
       position: absolute;
       bottom: 12px;
@@ -101,7 +101,7 @@
       width: 60px;
       height: 60px;
       border-radius: 16px;
-      background: rgba(30, 41, 59, 0.8);
+      background: rgba(30, 41, 59, 0.85);
       border: 2px solid rgba(255, 255, 255, 0.25);
       color: #ffffff;
       font-size: 24px;
@@ -137,23 +137,6 @@
       background: #34d399;
       color: #064e3b;
     }
-    /* Instructions Footer */
-    #instructions {
-      margin-top: 10px;
-      color: #94a3b8;
-      font-size: 13px;
-      text-align: center;
-      display: flex;
-      gap: 16px;
-    }
-    .key-hint {
-      background: #1e293b;
-      padding: 2px 7px;
-      border-radius: 4px;
-      border: 1px solid #334155;
-      color: #cbd5e1;
-      font-size: 11px;
-    }
   </style>
 </head>
 <body>
@@ -161,16 +144,14 @@
   <div id="game-container">
     <canvas id="gameCanvas" width="800" height="450"></canvas>
 
-    <!-- Top HUD -->
     <div id="top-hud">
       <div class="hud-badge" id="level-badge">NIVEL 1: TUTORIAL</div>
       <div style="display:flex; gap:8px;">
-        <button class="hud-btn" id="sound-btn">🔊 Sonido: ON</button>
-        <button class="hud-btn" id="restart-btn">↺ Reiniciar Nivel</button>
+        <button class="hud-btn" id="sound-btn">🔊 Sonido</button>
+        <button class="hud-btn" id="restart-btn">↺ Reiniciar</button>
       </div>
     </div>
 
-    <!-- Mobile Touch Controls -->
     <div id="touch-controls">
       <div class="dpad-container">
         <button class="touch-btn" id="btn-left" aria-label="Izquierda">◀</button>
@@ -182,13 +163,7 @@
     </div>
   </div>
 
-  <div id="instructions">
-    <span>Teclado: <span class="key-hint">◀ / A</span> <span class="key-hint">▶ / D</span> para moverte &bull; <span class="key-hint">ESPACIO / ⬆</span> para saltar</span>
-    <span>Móvil: Usa los botones táctiles en pantalla</span>
-  </div>
-
   <script>
-    // --- 1. WEB AUDIO 8-BIT SYNTHESIZER ---
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
     let soundEnabled = true;
@@ -272,7 +247,15 @@
       }
     }
 
-    // --- 2. GAME VARIABLES & STATE ---
+    const monsterImages = {
+      dude: new Image(),
+      pink: new Image(),
+      owlet: new Image()
+    };
+    monsterImages.dude.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDE0IDc5LjE1Njc5NywgMjAxNC8wOC8yMC0wOTo1MzowMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjUxREU3MjUyQjA5QjExRTk4Q0YzQUMzRjk2NDFCQkIwIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjUxREU3MjUzQjA5QjExRTk4Q0YzQUMzRjk2NDFCQkIwIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NTFERTcyNTBCMDlCMTFFOThDRjNBQzNGOTY0MUJCQjAiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NTFERTcyNTFCMDlCMTFFOThDRjNBQzNGOTY0MUJCQjAiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6PP5J2AAAAGFBMVEXDJC/8/v7nMzsDOWsP7/sGltsEGT8AAAAC4zXKAAAACHRSTlP/////////AN6DvVkAAACnSURBVHja1NJLDsMwCARQbMz4/jeuIbjyBxSpu7KdJwUmpv4y9H8AOjkAWmsiO1mAxiqYEQLPG7AJOnMDi9gAdAvRb9zgyUvBAGPNgh+BfsMAQtA8F86A1aBgOeM888wPILZADDpkTtxkB9HME1ArEbEOhf+ChzBDVEOg11efAOApyPPgCvj6RjgB7ARxUcyzhPU5XEXZmcmb/Pb8CpJnrwD9Ah8BBgDWgBhKFH6/JwAAAABJRU5ErkJggg==';
+    monsterImages.pink.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDE0IDc5LjE1Njc5NywgMjAxNC8wOC8yMC0wOTo1MzowMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjg0NTRGMzc3QUYwNjExRTlBOUUxOTA3OUI2Q0JFODJGIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjg0NTRGMzc4QUYwNjExRTlBOUUxOTA3OUI2Q0JFODJGIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6ODQ1NEYzNzVBRjA2MTFFOUE5RTE5MDc5QjZDQkU4MkYiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6ODQ1NEYzNzZBRjA2MTFFOUE5RTE5MDc5QjZDQkU4MkYiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4zBz29AAAAElBMVEXYQPt4C/f8/v4EGT/0ifYAAADNRSILAAAABnRSTlP//////wCzv6S/AAAAoUlEQVR42ryTQRYDIQhDg6H3v3JFxtdBwenrolnoIl9EQLwehL8C5H3bAaqaRRGmQPeN6P4JUBoQiHCFoqsGMGIMhNkV7jvBMoc2dA+BEKBdygD3STZbP0QEzKat/B3gcJkAmESRw8zyEqtCoXzmrNTWjBXQeH7NQXStdAq0DHAfh2Z9AwgO7bZpBbxUwvyZ5m8Tt9bhaaodYPmzso/zFmAA/mEQYB77AUIAAAAASUVORK5CYII=';
+    monsterImages.owlet.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDE0IDc5LjE1Njc5NywgMjAxNC8wOC8yMC0wOTo1MzowMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjMzMEUzMzNBQjA0QjExRTk5NzI1RjAwNjhDMEVCMzMzIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjMzMEUzMzNCQjA0QjExRTk5NzI1RjAwNjhDMEVCMzMzIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MzMwRTMzMzhCMDRCMTFFOTk3MjVGMDA2OEMwRUIzMzMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6MzMwRTMzMzlCMDRCMTFFOTk3MjVGMDA2OEMwRUIzMzMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4pPpygAAAAHlBMVEVeLCkcEhv9ohYcGjD8UAOUoLoqME5mcpH8/v4AAAAD02/MAAAACnRSTlP///////////8AsswszwAAAKpJREFUeNrU0kkWxCAIBFCMTWHuf+GGaDtE1HWzrf8MQ+g+FP0dwFNLACQrHgm9YhMMB+RYcvWCnFxkAuV5i/AAjKDL8zNpBL/2NIlLIAXEKCFIbF1Q2Y+0HoOKEZjhE+jGBByQhTiLmDepq/ZAndVu4axaJyHy8r5JJi2NmZa3KGg+Vvt+Sp/rmpvMMx4AduC5Btcp+99h3oOtSTYA/i9XAW5sgQZv8BVgAPVpICDQIbToAAAAAElFTkSuQmCC';
+
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const CW = 800;
@@ -284,39 +267,31 @@
     let confetti = [];
     let messageAlpha = 0;
 
-    // Keys
     const keys = { left: false, right: false, jump: false };
 
-    // Player
     const player = {
       x: 70,
       y: 330,
-      w: 28,
-      h: 36,
+      w: 32,
+      h: 34,
       vx: 0,
       vy: 0,
       speed: 4.2,
-      jumpForce: -11.5,
+      jumpForce: -11.6,
       gravity: 0.55,
       onGround: false,
       facing: 'right',
-      animState: 'idle',
-      animTimer: 0,
-      shirtColor: '#ef4444',
-      pantsColor: '#1d4ed8',
-      skinColor: '#ffd7b5',
-      hatColor: '#b91c1c'
+      animState: 'idle'
     };
 
-    // Level Definitions
     function getLevelData(lvl) {
       if (lvl === 1) {
         return {
           title: 'NIVEL 1: TUTORIAL',
           instruction: 'Usa Flechas para moverte y ESPACIO para saltar',
           platforms: [
-            { x: 40, y: 380, w: 720, h: 50, color: '#15803d' }, // suelo
-            { x: 300, y: 300, w: 140, h: 20, color: '#854d0e' }  // plataforma intermedia
+            { x: 40, y: 380, w: 720, h: 50, color: '#166534' },
+            { x: 300, y: 290, w: 150, h: 22, color: '#854d0e' }
           ],
           door: { x: 700, y: 310, w: 44, h: 70 },
           spawn: { x: 70, y: 330 },
@@ -327,27 +302,23 @@
           title: 'NIVEL 2: DESAFÍO',
           instruction: '¡Cuidado con el foso! Salta entre las 3 plataformas',
           platforms: [
-            { x: 40, y: 360, w: 140, h: 24, color: '#15803d' },  // Plataforma 1
-            { x: 260, y: 290, w: 150, h: 24, color: '#15803d' }, // Plataforma 2
-            { x: 490, y: 230, w: 150, h: 24, color: '#15803d' }, // Plataforma 3
-            { x: 690, y: 200, w: 90, h: 24, color: '#334155' }   // Meta
+            { x: 40, y: 360, w: 140, h: 24, color: '#15803d' },
+            { x: 260, y: 280, w: 150, h: 24, color: '#15803d' },
+            { x: 490, y: 220, w: 150, h: 24, color: '#15803d' },
+            { x: 690, y: 190, w: 85, h: 24, color: '#334155' }
           ],
-          door: { x: 710, y: 130, w: 44, h: 70 },
-          spawn: { x: 70, y: 300 },
-          pitY: 430 // Foso abajo
+          door: { x: 710, y: 120, w: 44, h: 70 },
+          spawn: { x: 60, y: 310 },
+          pitY: 425
         };
       } else {
         return {
           title: 'NIVEL 3: ¡SORPRESA DE CUMPLEAÑOS!',
           instruction: '¡Acércate y toca el cofre sorpresa!',
           platforms: [
-            { x: 40, y: 380, w: 720, h: 50, color: '#854d0e' } // Sala festiva
+            { x: 40, y: 380, w: 720, h: 50, color: '#78350f' }
           ],
-          chest: { x: 380, y: 336, w: 48, h: 44 },
-          npcs: [
-            { x: 240, y: 344, type: 1, name: 'Amigo Dani' },
-            { x: 530, y: 344, type: 2, name: 'Amiga Sofi' }
-          ],
+          chest: { x: 376, y: 334, w: 48, h: 46 },
           spawn: { x: 80, y: 330 },
           pitY: 460
         };
@@ -363,6 +334,7 @@
       player.y = levelData.spawn.y;
       player.vx = 0;
       player.vy = 0;
+      player.onGround = false;
       if (lvl === 3) {
         isChestOpened = false;
         confetti = [];
@@ -371,7 +343,6 @@
       document.getElementById('level-badge').innerText = levelData.title;
     }
 
-    // --- 3. INPUT HANDLING ---
     window.addEventListener('keydown', (e) => {
       getAudioCtx();
       if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
@@ -388,7 +359,6 @@
       if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') keys.jump = false;
     });
 
-    // Mobile Virtual Touch Buttons
     const bindTouch = (elemId, keyProp) => {
       const btn = document.getElementById(elemId);
       const press = (e) => {
@@ -416,7 +386,7 @@
 
     document.getElementById('sound-btn').onclick = () => {
       soundEnabled = !soundEnabled;
-      document.getElementById('sound-btn').innerText = soundEnabled ? '🔊 Sonido: ON' : '🔇 Sonido: OFF';
+      document.getElementById('sound-btn').innerText = soundEnabled ? '🔊 Sonido' : '🔇 Silencio';
       if (soundEnabled) getAudioCtx();
     };
 
@@ -424,14 +394,13 @@
       setLevel(currentLevel);
     };
 
-    // --- 4. CONFETTI GENERATOR ---
-    function spawnConfetti(amount = 140) {
+    function spawnConfetti(amount = 180) {
       const colors = ['#f43f5e', '#ec4899', '#a855f7', '#3b82f6', '#06b6d4', '#10b981', '#facc15', '#fb923c'];
       for (let i = 0; i < amount; i++) {
         confetti.push({
           x: CW / 2 + (Math.random() - 0.5) * 120,
           y: 320,
-          vx: (Math.random() - 0.5) * 12,
+          vx: (Math.random() - 0.5) * 13,
           vy: -6 - Math.random() * 9,
           size: 6 + Math.random() * 6,
           color: colors[Math.floor(Math.random() * colors.length)],
@@ -443,112 +412,133 @@
       }
     }
 
-    // --- 5. SPRITE & GRAPHICS DRAWING ---
-    function drawPixelBoy(x, y, w, h, facing, animState, frame) {
+    function drawMonster(x, y, w, h, id, facing, animState, frame) {
       ctx.save();
-      ctx.translate(x + w / 2, y + h);
-      if (facing === 'left') ctx.scale(-1, 1);
+      const cx = x + w / 2;
+      const cy = y + h;
 
-      const px = w / 14;
-      const bob = animState === 'walk' ? Math.sin(frame * 0.3) * (2 * px) : Math.sin(frame * 0.1) * (0.8 * px);
-      const legOffset = animState === 'walk' ? Math.sin(frame * 0.35) * (4 * px) : 0;
-      const isJumping = animState === 'jump';
-
-      // Shadow
-      ctx.fillStyle = 'rgba(0,0,0,0.25)';
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
       ctx.beginPath();
-      ctx.ellipse(0, -2, w * 0.45, 4, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, cy - 1, w * 0.45, 5, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      const bodyY = -h + (isJumping ? -3 : bob);
+      ctx.translate(cx, cy);
+      if (facing === 'left') ctx.scale(-1, 1);
 
-      // Shoes
-      ctx.fillStyle = '#1e293b';
-      if (isJumping) {
-        ctx.fillRect(-5 * px, -6 * px, 4 * px, 5 * px);
-        ctx.fillRect(1 * px, -8 * px, 4 * px, 5 * px);
+      let bobY = 0;
+      let tilt = 0;
+      let sx = 1, sy = 1;
+
+      if (animState === 'walk') {
+        bobY = -Math.abs(Math.sin(frame * 0.35)) * 4;
+        tilt = Math.sin(frame * 0.35) * 0.08;
+      } else if (animState === 'jump') {
+        sx = 0.88;
+        sy = 1.14;
+        bobY = -2;
       } else {
-        ctx.fillRect(-5 * px - legOffset * 0.5, -4 * px, 4 * px, 4 * px);
-        ctx.fillRect(1 * px + legOffset * 0.5, -4 * px, 4 * px, 4 * px);
+        bobY = Math.sin(frame * 0.08) * 1.5;
+        sy = 1 + Math.sin(frame * 0.08) * 0.03;
       }
 
-      // Pants
-      ctx.fillStyle = player.pantsColor;
-      ctx.fillRect(-5 * px, -11 * px, 10 * px, 7 * px);
+      ctx.translate(0, bobY);
+      ctx.rotate(tilt);
+      ctx.scale(sx, sy);
 
-      // Shirt
-      ctx.fillStyle = player.shirtColor;
-      ctx.fillRect(-5 * px, bodyY + 11 * px, 10 * px, 10 * px);
-
-      // Arms
-      const armSwing = animState === 'walk' ? Math.cos(frame * 0.35) * (4 * px) : 0;
-      ctx.fillRect(-7 * px - armSwing * 0.5, bodyY + 12 * px, 2.5 * px, 7 * px);
-      ctx.fillRect(4.5 * px + armSwing * 0.5, bodyY + 12 * px, 2.5 * px, 7 * px);
-
-      // Head
-      ctx.fillStyle = player.skinColor;
-      ctx.fillRect(-4.5 * px, bodyY + 2 * px, 9 * px, 9 * px);
-
-      // Eye
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0.5 * px, bodyY + 5 * px, 2.5 * px, 3 * px);
-
-      // Cap
-      ctx.fillStyle = player.hatColor;
-      ctx.fillRect(-5.5 * px, bodyY + 0.5 * px, 11 * px, 2.5 * px);
-      ctx.fillRect(1.5 * px, bodyY + 2 * px, 4.5 * px, 1.5 * px);
-
+      const img = monsterImages[id] || monsterImages.dude;
+      if (img.complete) {
+        ctx.drawImage(img, -w / 2, -h, w, h);
+      }
       ctx.restore();
     }
 
-    function drawNPC(npc, frame) {
+    function drawPartyNPC(x, y, w, h, id, frame, dialogue, facing) {
       ctx.save();
-      ctx.translate(npc.x + 14, npc.y + 36);
-      const px = 2;
-      const bounce = Math.sin(frame * 0.08 + npc.type) * 2;
+      const cx = x + w / 2;
+      const cy = y + h;
 
-      // Shadow
-      ctx.fillStyle = 'rgba(0,0,0,0.25)';
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
       ctx.beginPath();
-      ctx.ellipse(0, -2, 12, 4, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, cy - 1, w * 0.45, 5, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Body
-      ctx.fillStyle = npc.type === 1 ? '#0ea5e9' : '#10b981';
-      ctx.fillRect(-5 * px, -26 * px + bounce, 10 * px, 12 * px);
+      const bounce = -Math.abs(Math.sin(frame * 0.25)) * 9;
+      ctx.translate(cx, cy + bounce);
 
-      // Head
-      ctx.fillStyle = '#ffd7b5';
-      ctx.fillRect(-4 * px, -34 * px + bounce, 8 * px, 8 * px);
-
-      // Eyes
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, -31 * px + bounce, 2 * px, 2 * px);
+      // Monster body with facing flip
+      ctx.save();
+      if (facing === 'left') {
+        ctx.scale(-1, 1);
+      }
+      const img = monsterImages[id] || monsterImages.pink;
+      if (img.complete) {
+        ctx.drawImage(img, -w / 2, -h, w, h);
+      }
 
       // Party Cone Hat
-      ctx.fillStyle = npc.type === 1 ? '#f43f5e' : '#8b5cf6';
+      ctx.fillStyle = id === 'pink' ? '#f43f5e' : '#8b5cf6';
       ctx.beginPath();
-      ctx.moveTo(-3 * px, -34 * px + bounce);
-      ctx.lineTo(3 * px, -34 * px + bounce);
-      ctx.lineTo(0, -44 * px + bounce);
+      ctx.moveTo(-6, -h + 4);
+      ctx.lineTo(6, -h + 4);
+      ctx.lineTo(0, -h - 14);
       ctx.closePath();
       ctx.fill();
 
-      // Balloon on NPC 1
-      if (npc.type === 1) {
-        ctx.strokeStyle = '#cbd5e1';
-        ctx.lineWidth = 1;
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath();
+      ctx.arc(0, -h - 14, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Floating Balloons for both characters
+      const bx = (facing === 'left' ? 18 : -18) + Math.sin(frame * 0.06) * 4;
+      const by = -h - 38 + Math.cos(frame * 0.05) * 3;
+
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(facing === 'left' ? 8 : -8, -h + 12);
+      ctx.lineTo(bx, by + 8);
+      ctx.stroke();
+
+      ctx.fillStyle = facing === 'left' ? '#06b6d4' : '#f43f5e';
+      ctx.beginPath();
+      ctx.ellipse(bx - 6, by - 6, 8, 11, -0.1, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = facing === 'left' ? '#a855f7' : '#facc15';
+      ctx.beginPath();
+      ctx.ellipse(bx + 6, by - 12, 8, 11, 0.15, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Spacious, perfectly aligned speech bubble
+      if (dialogue) {
+        ctx.font = 'bold 12px sans-serif';
+        const textWidth = ctx.measureText(dialogue).width;
+        const bw = Math.max(textWidth + 24, 82);
+        const bh = 26;
+        const bX = -bw / 2;
+        const bY = -h - 44;
+
+        ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.moveTo(-4 * px, -22 * px + bounce);
-        const bx = -16 + Math.sin(frame * 0.05) * 4;
-        const by = -52 + Math.cos(frame * 0.05) * 3;
-        ctx.lineTo(bx, by);
+        ctx.roundRect(bX, bY, bw, bh, 8);
+        ctx.fill();
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        ctx.fillStyle = '#ef4444';
         ctx.beginPath();
-        ctx.ellipse(bx, by, 8, 11, 0, 0, Math.PI * 2);
+        ctx.moveTo(-4, bY + bh);
+        ctx.lineTo(4, bY + bh);
+        ctx.lineTo(0, bY + bh + 5);
+        ctx.closePath();
         ctx.fill();
+
+        ctx.fillStyle = '#0f172a';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(dialogue, 0, bY + bh / 2);
       }
 
       ctx.restore();
@@ -558,13 +548,11 @@
       ctx.save();
       ctx.translate(chest.x, chest.y);
 
-      // Shadow
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
       ctx.beginPath();
       ctx.ellipse(chest.w / 2, chest.h + 2, chest.w * 0.55, 6, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Base Box
       ctx.fillStyle = '#78350f';
       ctx.fillRect(2, chest.h * 0.4, chest.w - 4, chest.h * 0.6);
       ctx.fillStyle = '#f59e0b';
@@ -573,17 +561,14 @@
       ctx.fillRect(2, chest.h - 4, chest.w - 4, 4);
 
       if (!isChestOpened) {
-        // Closed Lid
         ctx.fillStyle = '#b45309';
         ctx.fillRect(0, chest.h * 0.1, chest.w, chest.h * 0.35);
         ctx.beginPath();
         ctx.arc(chest.w / 2, chest.h * 0.25, chest.w * 0.48, Math.PI, 0);
         ctx.fill();
-        // Lock
         ctx.fillStyle = '#fbbf24';
         ctx.fillRect(chest.w / 2 - 4, chest.h * 0.38, 8, 10);
       } else {
-        // Open Lid
         ctx.fillStyle = '#92400e';
         ctx.beginPath();
         ctx.moveTo(0, chest.h * 0.4);
@@ -593,7 +578,6 @@
         ctx.closePath();
         ctx.fill();
 
-        // Shining golden rays
         const glow = ctx.createRadialGradient(chest.w/2, chest.h*0.3, 2, chest.w/2, chest.h*0.3, 35);
         glow.addColorStop(0, 'rgba(253, 224, 71, 0.9)');
         glow.addColorStop(1, 'rgba(251, 191, 36, 0)');
@@ -609,36 +593,30 @@
     function drawDoor(door, frame) {
       ctx.save();
       ctx.translate(door.x, door.y);
-      // Stone frame
       ctx.fillStyle = '#475569';
       ctx.fillRect(-3, 0, door.w + 6, door.h);
       ctx.beginPath();
       ctx.arc(door.w / 2, 6, (door.w + 6) / 2, Math.PI, 0);
       ctx.fill();
 
-      // Wooden door
       ctx.fillStyle = '#78350f';
       ctx.fillRect(0, 4, door.w, door.h - 4);
 
-      // Knob
       ctx.fillStyle = '#fbbf24';
       ctx.beginPath();
       ctx.arc(8, door.h * 0.55, 3.5, 0, Math.PI * 2);
       ctx.fill();
 
-      // Portal glow
       const pulse = Math.sin(frame * 0.1) * 0.3 + 0.7;
-      ctx.fillStyle = `rgba(56, 189, 248, ${0.4 * pulse})`;
+      ctx.fillStyle = 'rgba(56, 189, 248, ' + (0.4 * pulse) + ')';
       ctx.fillRect(2, door.h - 4, door.w - 4, 4);
 
       ctx.restore();
     }
 
-    // --- 6. MAIN GAME LOOP ---
     function update() {
       animFrameCount++;
 
-      // Player Movement Horizontal
       if (keys.left) {
         player.vx = -player.speed;
         player.facing = 'left';
@@ -649,25 +627,19 @@
         player.vx = 0;
       }
 
-      // Player Jump
       if (keys.jump && player.onGround) {
         player.vy = player.jumpForce;
         player.onGround = false;
         playSound('jump');
       }
 
-      // Apply Gravity
       player.vy += player.gravity;
-
-      // Update positions
       player.x += player.vx;
       player.y += player.vy;
 
-      // Keep within left/right bounds
       if (player.x < 10) player.x = 10;
       if (player.x + player.w > CW - 10) player.x = CW - 10 - player.w;
 
-      // Check Platforms collision (AABB)
       player.onGround = false;
       for (const plat of levelData.platforms) {
         if (
@@ -684,7 +656,6 @@
         }
       }
 
-      // Anim state
       if (!player.onGround) {
         player.animState = 'jump';
       } else if (Math.abs(player.vx) > 0.1) {
@@ -696,11 +667,11 @@
       // Check Pitfall (Nivel 2)
       if (player.y > levelData.pitY) {
         playSound('fall');
-        setLevel(currentLevel); // Reinicia el nivel si cae al foso
+        setLevel(currentLevel);
         return;
       }
 
-      // Check Door Collision (Niveles 1 y 2)
+      // Check Door Collision
       if (levelData.door) {
         const d = levelData.door;
         if (
@@ -715,7 +686,7 @@
         }
       }
 
-      // Check Chest Collision (Nivel 3)
+      // Check Chest Collision (Nivel 3 -> Revelar los otros dos personajes)
       if (currentLevel === 3 && levelData.chest && !isChestOpened) {
         const c = levelData.chest;
         if (
@@ -730,16 +701,14 @@
         }
       }
 
-      // Update Confetti
       for (let i = confetti.length - 1; i >= 0; i--) {
         const p = confetti[i];
-        p.vy += 0.12; // Gravity
+        p.vy += 0.12;
         p.x += p.vx;
         p.y += p.vy;
         p.rotation += p.vRot;
         p.life++;
         if (p.life > p.maxLife || p.y > CH + 40) {
-          // If chest still open, cycle some confetti
           if (isChestOpened && Math.random() < 0.3) {
             p.y = -20;
             p.x = Math.random() * CW;
@@ -757,13 +726,10 @@
     }
 
     function render() {
-      // Clear Screen
       ctx.fillStyle = currentLevel === 3 ? '#1e1b4b' : '#0f172a';
       ctx.fillRect(0, 0, CW, CH);
 
-      // Background Environment
       if (currentLevel === 1) {
-        // Clouds / Sky
         ctx.fillStyle = '#1e293b';
         ctx.fillRect(0, 0, CW, 380);
         ctx.fillStyle = 'rgba(255,255,255,0.08)';
@@ -773,14 +739,12 @@
         ctx.arc(230, 100, 40, 0, Math.PI * 2);
         ctx.fill();
       } else if (currentLevel === 2) {
-        // Pit / Lava at bottom
         const pitGradient = ctx.createLinearGradient(0, 390, 0, CH);
         pitGradient.addColorStop(0, 'rgba(239, 68, 68, 0.4)');
         pitGradient.addColorStop(1, 'rgba(185, 28, 28, 0.95)');
         ctx.fillStyle = pitGradient;
         ctx.fillRect(0, 390, CW, 60);
 
-        // Hazard spikes / bubbles
         ctx.fillStyle = '#ef4444';
         for (let x = 10; x < CW; x += 30) {
           ctx.beginPath();
@@ -790,7 +754,6 @@
           ctx.fill();
         }
       } else if (currentLevel === 3) {
-        // Birthday Garland & Flags
         const colors = ['#f43f5e', '#3b82f6', '#facc15', '#10b981', '#a855f7'];
         for (let i = 0; i < 16; i++) {
           ctx.fillStyle = colors[i % colors.length];
@@ -804,43 +767,40 @@
         }
       }
 
-      // Draw Platforms
       for (const plat of levelData.platforms) {
         ctx.fillStyle = plat.color;
         ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
-
-        // Grass or highlight top
         ctx.fillStyle = 'rgba(255,255,255,0.2)';
         ctx.fillRect(plat.x, plat.y, plat.w, 4);
-
-        // Dark underside
         ctx.fillStyle = 'rgba(0,0,0,0.3)';
         ctx.fillRect(plat.x, plat.y + plat.h - 4, plat.w, 4);
       }
 
-      // Draw Door (Level 1 & 2)
       if (levelData.door) {
         drawDoor(levelData.door, animFrameCount);
       }
 
-      // Draw Level 3 Elements (Chest, NPCs)
+      // LEVEL 3: Los dos últimos personajes SOLO se muestran al alcanzar el tesoro
       if (currentLevel === 3) {
-        // Draw NPCs
-        if (levelData.npcs) {
-          levelData.npcs.forEach(npc => drawNPC(npc, animFrameCount));
+        if (isChestOpened) {
+          // Left NPC facing right towards chest, with balloons
+          drawPartyNPC(230, 346, 32, 34, 'pink', animFrameCount, '¡Sorpresa!', 'right');
+          // Right NPC facing left towards chest, with balloons
+          drawPartyNPC(530, 346, 32, 34, 'owlet', animFrameCount, '¡Feliz Cumple!', 'left');
         }
-        // Draw Chest
+
         if (levelData.chest) {
           drawChest(levelData.chest, animFrameCount);
         }
       }
 
-      // Draw Player
-      drawPixelBoy(
+      // Draw Player Monster
+      drawMonster(
         player.x,
         player.y,
         player.w,
         player.h,
+        'dude',
         player.facing,
         player.animState,
         animFrameCount
@@ -856,7 +816,6 @@
         ctx.restore();
       }
 
-      // Instruction Text in Game Canvas
       ctx.textAlign = 'center';
       if (currentLevel === 1) {
         ctx.fillStyle = '#f8fafc';
@@ -876,7 +835,6 @@
           ctx.font = 'bold 16px -apple-system, sans-serif';
           ctx.fillText('¡Toca el cofre dorado en el centro!', CW / 2, 100);
 
-          // Arrow pointing down to chest
           const bounce = Math.sin(animFrameCount * 0.1) * 6;
           ctx.fillStyle = '#fbbf24';
           ctx.beginPath();
@@ -885,18 +843,15 @@
           ctx.lineTo(CW / 2 + 12, 275 + bounce);
           ctx.fill();
         } else {
-          // HUGE BIRTHDAY CELEBRATION BANNER
           ctx.save();
           ctx.globalAlpha = messageAlpha;
 
-          // Backdrop card
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
           ctx.fillRect(CW / 2 - 280, 50, 560, 110);
           ctx.strokeStyle = '#facc15';
           ctx.lineWidth = 3;
           ctx.strokeRect(CW / 2 - 280, 50, 560, 110);
 
-          // Main Happy Birthday text
           ctx.fillStyle = '#facc15';
           ctx.font = '900 36px -apple-system, sans-serif';
           ctx.fillText('🎉 ¡FELIZ CUMPLEAÑOS! 🎂', CW / 2, 105);
@@ -916,7 +871,6 @@
       requestAnimationFrame(gameLoop);
     }
 
-    // Start Game
     setLevel(1);
     requestAnimationFrame(gameLoop);
   </script>

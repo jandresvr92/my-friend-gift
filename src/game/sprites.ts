@@ -126,7 +126,8 @@ export function drawMonsterNPC(
   animFrame: number,
   dialogueText?: string,
   holdsBalloons: boolean = false,
-  isCheering: boolean = false
+  isCheering: boolean = false,
+  facing: 'left' | 'right' = 'right'
 ) {
   ctx.save();
   ctx.imageSmoothingEnabled = false;
@@ -146,6 +147,12 @@ export function drawMonsterNPC(
     : Math.sin(animFrame * 0.09 + (characterId === 'pink' ? 1 : 2)) * 2;
 
   ctx.translate(centerX, bottomY + bounce);
+
+  // --- MONSTER SPRITE WITH FACING ORIENTATION ---
+  ctx.save();
+  if (facing === 'left') {
+    ctx.scale(-1, 1);
+  }
 
   const img = getMonsterImage(characterId);
   if (img && img.complete) {
@@ -181,64 +188,93 @@ export function drawMonsterNPC(
   ctx.arc(0, -height - 15, 3.5, 0, Math.PI * 2);
   ctx.fill();
 
-  // --- FLOATING BALLOONS ---
+  ctx.restore();
+
+  // --- FLOATING BALLOONS (Positioned relative to facing direction) ---
   if (holdsBalloons) {
     const stringWiggle = Math.sin(animFrame * 0.06) * 4;
-    const balloonX = -18 + stringWiggle;
+    const balloonOffsetSide = facing === 'left' ? 18 : -18;
+    const balloonX = balloonOffsetSide + stringWiggle;
     const balloonY = -height - 38 + Math.cos(animFrame * 0.05) * 3;
 
     // String
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.moveTo(-8, -height + 14);
+    ctx.moveTo(facing === 'left' ? 8 : -8, -height + 14);
     ctx.lineTo(balloonX, balloonY + 8);
     ctx.stroke();
 
-    // Balloon 1 (Red/Pink)
-    ctx.fillStyle = '#f43f5e';
+    // Balloon 1
+    const color1 = facing === 'left' ? '#06b6d4' : '#f43f5e';
+    ctx.fillStyle = color1;
     ctx.beginPath();
     ctx.ellipse(balloonX - 6, balloonY - 6, 8, 11, -0.15, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
     ctx.beginPath();
     ctx.arc(balloonX - 8, balloonY - 10, 2.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Balloon 2 (Yellow/Gold)
-    ctx.fillStyle = '#facc15';
+    // Balloon 2
+    const color2 = facing === 'left' ? '#a855f7' : '#facc15';
+    ctx.fillStyle = color2;
     ctx.beginPath();
     ctx.ellipse(balloonX + 6, balloonY - 12, 8, 11, 0.15, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
     ctx.beginPath();
     ctx.arc(balloonX + 4, balloonY - 16, 2.5, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  // --- DIALOGUE BUBBLE ---
+  // --- DIALOGUE BUBBLE (Calculated with ample padding and centered text) ---
   if (dialogueText) {
-    ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
-    const textWidth = ctx.measureText(dialogueText).width;
-    const bw = textWidth + 14;
-    const bh = 22;
+    ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+    const textMetrics = ctx.measureText(dialogueText);
+    const bw = Math.max(textMetrics.width + 24, 82);
+    const bh = 26;
     const bx = -bw / 2;
-    const by = -height - (holdsBalloons ? 32 : 28);
+    const by = -height - (holdsBalloons ? 44 : 34);
 
+    // Drop shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.beginPath();
+    ctx.roundRect(bx + 1, by + 2, bw, bh, 8);
+    ctx.fill();
+
+    // Bubble body
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.roundRect(bx, by, bw, bh, 6);
+    ctx.roundRect(bx, by, bw, bh, 8);
     ctx.fill();
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
 
-    // Bubble pointer
+    // Pointer tail pointing down towards the character
+    ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.moveTo(-4, by + bh);
-    ctx.lineTo(4, by + bh);
-    ctx.lineTo(0, by + bh + 4);
+    ctx.moveTo(-5, by + bh);
+    ctx.lineTo(5, by + bh);
+    ctx.lineTo(0, by + bh + 5);
+    ctx.closePath();
     ctx.fill();
 
+    // Tail outline
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-5, by + bh);
+    ctx.lineTo(0, by + bh + 5);
+    ctx.lineTo(5, by + bh);
+    ctx.stroke();
+
+    // Centered dialogue text with perfect vertical alignment
     ctx.fillStyle = '#0f172a';
-    ctx.fillText(dialogueText, bx + 7, by + 15);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(dialogueText, 0, by + bh / 2);
   }
 
   ctx.restore();
