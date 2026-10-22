@@ -1,0 +1,6 @@
+{
+  "name": "Plataformas Cumpleaños 2D",
+  "description": "Minijuego de plataformas 2D en HTML5 Canvas con 3 niveles, física de saltos, controles táctiles y celebración con confeti.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
