@@ -190,55 +190,55 @@ export function drawMonsterNPC(
 
   ctx.restore();
 
-  // --- FLOATING BALLOONS (Positioned relative to facing direction) ---
+  // --- FLOATING BALLOON (Yellow for Dude on left, Purple for Owlet on right) ---
   if (holdsBalloons) {
-    const stringWiggle = Math.sin(animFrame * 0.06) * 4;
-    const balloonOffsetSide = facing === 'left' ? 18 : -18;
+    const stringWiggle = Math.sin(animFrame * 0.06) * 3;
+    const balloonOffsetSide = facing === 'left' ? 22 : -22;
     const balloonX = balloonOffsetSide + stringWiggle;
-    const balloonY = -height - 38 + Math.cos(animFrame * 0.05) * 3;
+    const balloonY = -height - 40 + Math.cos(animFrame * 0.05) * 3;
 
     // String
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1.3;
     ctx.beginPath();
-    ctx.moveTo(facing === 'left' ? 8 : -8, -height + 14);
-    ctx.lineTo(balloonX, balloonY + 8);
+    ctx.moveTo(facing === 'left' ? 10 : -10, -height + 14);
+    ctx.lineTo(balloonX, balloonY + 12);
     ctx.stroke();
 
-    // Balloon 1
-    const color1 = facing === 'left' ? '#06b6d4' : '#f43f5e';
-    ctx.fillStyle = color1;
+    // Balloon body
+    const balloonColor = characterId === 'dude' ? '#eab308' : '#a855f7';
+    ctx.fillStyle = balloonColor;
     ctx.beginPath();
-    ctx.ellipse(balloonX - 6, balloonY - 6, 8, 11, -0.15, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.45)';
-    ctx.beginPath();
-    ctx.arc(balloonX - 8, balloonY - 10, 2.5, 0, Math.PI * 2);
+    ctx.ellipse(balloonX, balloonY, 11, 14, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Balloon 2
-    const color2 = facing === 'left' ? '#a855f7' : '#facc15';
-    ctx.fillStyle = color2;
+    // Balloon knot
+    ctx.fillStyle = balloonColor;
     ctx.beginPath();
-    ctx.ellipse(balloonX + 6, balloonY - 12, 8, 11, 0.15, 0, Math.PI * 2);
+    ctx.moveTo(balloonX - 3, balloonY + 14);
+    ctx.lineTo(balloonX + 3, balloonY + 14);
+    ctx.lineTo(balloonX, balloonY + 17);
+    ctx.closePath();
     ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+
+    // Balloon gloss highlight
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
     ctx.beginPath();
-    ctx.arc(balloonX + 4, balloonY - 16, 2.5, 0, Math.PI * 2);
+    ctx.ellipse(balloonX - 3.5, balloonY - 4.5, 3.5, 5.5, -0.2, 0, Math.PI * 2);
     ctx.fill();
   }
 
   // --- DIALOGUE BUBBLE (Calculated with ample padding and centered text) ---
   if (dialogueText) {
-    ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+    ctx.font = 'bold 13px "Plus Jakarta Sans", sans-serif';
     const textMetrics = ctx.measureText(dialogueText);
-    const bw = Math.max(textMetrics.width + 24, 82);
-    const bh = 26;
+    const bw = Math.max(textMetrics.width + 26, 90);
+    const bh = 28;
     const bx = -bw / 2;
-    const by = -height - (holdsBalloons ? 44 : 34);
+    const by = -height - (holdsBalloons ? 48 : 36);
 
     // Drop shadow
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
     ctx.beginPath();
     ctx.roundRect(bx + 1, by + 2, bw, bh, 8);
     ctx.fill();

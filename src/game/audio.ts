@@ -205,7 +205,6 @@ class SoundEngine {
 
     try {
       const now = this.ctx.currentTime;
-      // Synthesize Animal Crossing / Celeste style phonetic chirps with randomized pitch intervals
       const baseFreqs = [480, 540, 620, 680, 760, 840];
       for (let i = 0; i < count; i++) {
         if (!this.ctx) return;
@@ -218,7 +217,6 @@ class SoundEngine {
 
         osc.type = Math.random() > 0.4 ? 'square' : 'triangle';
         osc.frequency.setValueAtTime(freq, t);
-        // Micro-pitch slide characteristic of Animalese speech
         osc.frequency.exponentialRampToValueAtTime(freq * (0.92 + Math.random() * 0.22), t + duration);
 
         gain.gain.setValueAtTime(0.12, t);
@@ -232,6 +230,101 @@ class SoundEngine {
       }
     } catch {}
   }
+
+  /**
+   * Expressive, non-monotone congratulatory character voices for Dude & Owlet.
+   * Simulates cheerful cartoon/Banjo-Kazooie style phonetic phrases with joyful inflections.
+   */
+  public playCongratulatoryVoices() {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+
+      // 1. Dude Monster Voice: Enthusiastic "¡Sor-pre-sa!" (Mid-low energetic syllables)
+      const dudeSyllables = [
+        { f: 260, d: 0.09, t: 0.00, slide: 320, type: 'square' as const },
+        { f: 330, d: 0.08, t: 0.08, slide: 390, type: 'triangle' as const },
+        { f: 392, d: 0.11, t: 0.16, slide: 490, type: 'square' as const },
+        { f: 523, d: 0.16, t: 0.26, slide: 587, type: 'triangle' as const },
+      ];
+
+      dudeSyllables.forEach((s) => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const startTime = now + s.t;
+
+        osc.type = s.type;
+        osc.frequency.setValueAtTime(s.f, startTime);
+        osc.frequency.exponentialRampToValueAtTime(s.slide, startTime + s.d);
+
+        gain.gain.setValueAtTime(0.18, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.005, startTime + s.d);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(startTime);
+        osc.stop(startTime + s.d + 0.01);
+      });
+
+      // 2. Owlet Monster Voice: High-spirited joyful cheer "¡Fe-liz Cum-ple!" (Higher singing vibrato)
+      const owletOffset = 0.38;
+      const owletSyllables = [
+        { f: 587, d: 0.08, t: 0.00, slide: 659, type: 'triangle' as const },
+        { f: 659, d: 0.08, t: 0.08, slide: 784, type: 'square' as const },
+        { f: 784, d: 0.10, t: 0.16, slide: 880, type: 'triangle' as const },
+        { f: 1046, d: 0.22, t: 0.25, slide: 1174, type: 'triangle' as const },
+      ];
+
+      owletSyllables.forEach((s) => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const startTime = now + owletOffset + s.t;
+
+        osc.type = s.type;
+        osc.frequency.setValueAtTime(s.f, startTime);
+        osc.frequency.exponentialRampToValueAtTime(s.slide, startTime + s.d);
+
+        gain.gain.setValueAtTime(0.16, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.005, startTime + s.d);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(startTime);
+        osc.stop(startTime + s.d + 0.01);
+      });
+
+      // 3. Shared joyful laughing / cheering burst at the end
+      const cheerOffset = 0.76;
+      for (let i = 0; i < 6; i++) {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const startTime = now + cheerOffset + i * 0.05;
+        const freq = 600 + (i % 2 === 0 ? 150 : 250);
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, startTime);
+        osc.frequency.exponentialRampToValueAtTime(freq * 1.25, startTime + 0.045);
+
+        gain.gain.setValueAtTime(0.12, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.002, startTime + 0.045);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(startTime);
+        osc.stop(startTime + 0.05);
+      }
+    } catch {}
+  }
 }
 
 export const sound = new SoundEngine();
+

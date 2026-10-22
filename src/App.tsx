@@ -9,18 +9,23 @@ import { sound } from './game/audio';
 import {
   drawMonsterCharacter,
   drawMonsterNPC,
-  drawChest,
   drawDoor,
+  drawChest,
   createConfettiParticle,
   ConfettiParticle,
 } from './game/sprites';
+import {
+  drawNightSky,
+  drawMountainRanges,
+  drawPineForest,
+  drawPixelGround,
+} from './game/scenery';
 
 interface Platform {
   x: number;
   y: number;
   w: number;
   h: number;
-  color: string;
   type?: 'ground' | 'floating' | 'goal';
 }
 
@@ -41,12 +46,12 @@ export default function App() {
 
   // Playable Character is Pink Monster (Leslie)
   const selectedCharacter: 'pink' = 'pink';
-  const [currentLevel, setCurrentLevel] = useState<number>(1);
+  const [currentLevel, setCurrentLevel] = useState<number>(1); // Starts at Level 1
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
-  // Virtual Canvas Dimensions (16:9 internal resolution)
-  const V_WIDTH = 800;
-  const V_HEIGHT = 450;
+  // Virtual Canvas Dimensions
+  const V_WIDTH = 580;
+  const V_HEIGHT = 520;
 
   // Active Keys State Ref
   const inputRef = useRef({
@@ -55,17 +60,17 @@ export default function App() {
     jump: false,
   });
 
-  // Player state ref
+  // Player state ref (Scale 44x48)
   const playerRef = useRef({
-    x: 70,
-    y: 330,
-    w: 32,
-    h: 34,
+    x: 50,
+    y: 382,
+    w: 44,
+    h: 48,
     vx: 0,
     vy: 0,
-    speed: 4.2,
-    jumpForce: -11.6,
-    gravity: 0.55,
+    speed: 4.6,
+    jumpForce: -12.4,
+    gravity: 0.62,
     onGround: false,
     facing: 'right' as 'left' | 'right',
     animState: 'idle' as 'idle' | 'walk' | 'jump',
@@ -87,47 +92,48 @@ export default function App() {
     gameStateRef.current.characterId = selectedCharacter;
   }, [selectedCharacter]);
 
-  // Level definitions
+  // Level definitions with rich pixel art scenery
   const levels: Record<number, LevelConfig> = {
     1: {
       id: 1,
       title: 'NIVEL 1: TUTORIAL',
       subtitle: 'Aprende los controles básicos',
-      instruction: 'Usa Flechas / D-Pad para moverte y ESPACIO / SALTO para saltar',
+      instruction: 'Usa ◀ ▶ para moverte y ▲ para saltar',
       platforms: [
-        { x: 40, y: 380, w: 720, h: 50, color: '#166534', type: 'ground' },
-        { x: 300, y: 290, w: 150, h: 22, color: '#854d0e', type: 'floating' },
+        { x: 20, y: 430, w: 540, h: 90, type: 'ground' },
+        { x: 180, y: 320, w: 180, h: 26, type: 'floating' },
       ],
-      door: { x: 700, y: 310, w: 44, h: 70 },
-      spawn: { x: 70, y: 330 },
-      pitY: 460,
+      door: { x: 490, y: 335, w: 52, h: 95 },
+      spawn: { x: 50, y: 382 },
+      pitY: 540,
     },
     2: {
       id: 2,
       title: 'NIVEL 2: DESAFÍO',
       subtitle: '¡Cuidado con el foso!',
-      instruction: 'Salta con precisión entre las 3 plataformas elevadas. ¡Si caes, reiniciarás el nivel!',
+      instruction: 'Salta con precisión entre las plataformas',
       platforms: [
-        { x: 40, y: 360, w: 140, h: 24, color: '#15803d', type: 'floating' },
-        { x: 260, y: 280, w: 150, h: 24, color: '#15803d', type: 'floating' },
-        { x: 490, y: 220, w: 150, h: 24, color: '#15803d', type: 'floating' },
-        { x: 690, y: 190, w: 85, h: 24, color: '#334155', type: 'goal' },
+        { x: 20, y: 410, w: 120, h: 100, type: 'floating' },
+        { x: 180, y: 320, w: 140, h: 30, type: 'floating' },
+        { x: 360, y: 230, w: 130, h: 30, type: 'floating' },
+        { x: 480, y: 160, w: 85, h: 30, type: 'goal' },
       ],
-      door: { x: 710, y: 120, w: 44, h: 70 },
-      spawn: { x: 60, y: 310 },
-      pitY: 425, // Foso abisal
+      door: { x: 495, y: 70, w: 52, h: 90 },
+      spawn: { x: 45, y: 350 },
+      pitY: 480, // Lava pit
     },
     3: {
       id: 3,
       title: 'NIVEL 3: GRAN FINAL',
       subtitle: '¡La fiesta de cumpleaños!',
-      instruction: 'Tus dos amigos te están esperando... ¡Acércate y toca el cofre sorpresa!',
+      instruction: '¡Abre el cofre de cumpleaños!',
       platforms: [
-        { x: 40, y: 380, w: 720, h: 50, color: '#78350f', type: 'ground' },
+        { x: 20, y: 430, w: 540, h: 90, type: 'ground' },
       ],
-      chest: { x: 376, y: 334, w: 48, h: 46 },
-      spawn: { x: 80, y: 330 },
-      pitY: 460,
+      // Bottom of chest rests on ground (376 + 54 = 430)
+      chest: { x: 264, y: 376, w: 52, h: 54 },
+      spawn: { x: 60, y: 382 },
+      pitY: 540,
     },
   };
 
@@ -152,142 +158,137 @@ export default function App() {
     setCurrentLevel(lvl.id);
   };
 
-  // Sound toggle
+  // Full Restart back to Level 1
+  const handleFullRestart = () => {
+    loadLevel(1);
+  };
+
+  // Toggle audio
   const toggleSound = () => {
-    const nextVal = !soundEnabled;
-    setSoundEnabled(nextVal);
-    sound.setEnabled(nextVal);
+    const nextState = !soundEnabled;
+    sound.setEnabled(nextState);
+    setSoundEnabled(nextState);
   };
 
-  // Spawn confetti explosion
-  const triggerConfettiExplosion = (count = 240) => {
-    const newParticles: ConfettiParticle[] = [];
+  // Confetti explosion
+  const triggerConfettiExplosion = (count: number = 240) => {
+    const newConfetti: ConfettiParticle[] = [];
     for (let i = 0; i < count; i++) {
-      const p = createConfettiParticle(V_WIDTH);
-      p.x = V_WIDTH / 2 + (Math.random() - 0.5) * 120;
-      p.y = 310;
-      p.vx = (Math.random() - 0.5) * 15;
-      p.vy = -6 - Math.random() * 11;
-      newParticles.push(p);
+      newConfetti.push(createConfettiParticle(V_WIDTH));
     }
-    gameStateRef.current.confetti.push(...newParticles);
+    gameStateRef.current.confetti = newConfetti;
   };
 
-  // Download Standalone Single-file index.html
-  const handleDownloadStandalone = () => {
-    fetch('/minijuego.html')
-      .then((res) => res.text())
-      .then((content) => {
-        const blob = new Blob([content], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'index.html';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      })
-      .catch(() => {
-        window.open('/minijuego.html', '_blank');
-      });
+  // Standalone index.html download
+  const handleDownloadStandalone = async () => {
+    try {
+      const response = await fetch('/minijuego.html');
+      let htmlText = '';
+      if (response.ok) {
+        htmlText = await response.text();
+      } else {
+        htmlText = '<!DOCTYPE html><html><body><h1>Juego Leslie</h1></body></html>';
+      }
+
+      const blob = new Blob([htmlText], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'juego_cumpleanos_leslie.html';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch {
+      window.open('/minijuego.html', '_blank');
+    }
   };
 
-  // KEYBOARD LISTENERS
+  // Keyboard controls
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (soundEnabled) sound.setEnabled(true);
-
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
         inputRef.current.left = true;
-      }
-      if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+      } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
         inputRef.current.right = true;
-      }
-      if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+      } else if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
         inputRef.current.jump = true;
-        e.preventDefault();
-      }
-      if (e.code === 'KeyR') {
-        loadLevel(gameStateRef.current.level);
+      } else if (e.code === 'KeyR') {
+        handleFullRestart();
       }
     };
 
-    const onKeyUp = (e: KeyboardEvent) => {
+    const handleKeyUp = (e: KeyboardEvent) => {
       if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
         inputRef.current.left = false;
-      }
-      if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+      } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
         inputRef.current.right = false;
-      }
-      if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+      } else if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
         inputRef.current.jump = false;
       }
     };
 
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
-    return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
-    };
-  }, [soundEnabled]);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
-  // MAIN GAME ENGINE LOOP
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  // Main game physics & rendering loop
   useEffect(() => {
+    let animId: number;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animId: number;
-
     const gameLoop = () => {
-      animId = requestAnimationFrame(gameLoop);
-
       const p = playerRef.current;
       const g = gameStateRef.current;
       const input = inputRef.current;
-      const lvl = levels[g.level] || levels[1];
+      const lvl = levels[g.level];
 
       g.frameCounter++;
       p.animFrame++;
 
-      // 1. HORIZONTAL MOVEMENT
-      if (input.left && !input.right) {
+      // 1. HORIZONTAL VELOCITY
+      if (input.left) {
         p.vx = -p.speed;
         p.facing = 'left';
-      } else if (input.right && !input.left) {
+      } else if (input.right) {
         p.vx = p.speed;
         p.facing = 'right';
       } else {
         p.vx = 0;
       }
 
-      // 2. JUMPING
+      // 2. JUMP ACTION
       if (input.jump && p.onGround) {
         p.vy = p.jumpForce;
         p.onGround = false;
         sound.playJump();
       }
 
-      // 3. GRAVITY & POS
+      // 3. GRAVITY & MOVEMENT
       p.vy += p.gravity;
       p.x += p.vx;
       p.y += p.vy;
 
-      // 4. BOUNDS CHECK
-      if (p.x < 10) p.x = 10;
-      if (p.x + p.w > V_WIDTH - 10) p.x = V_WIDTH - 10 - p.w;
+      // 4. SCREEN BOUNDS
+      if (p.x < 15) p.x = 15;
+      if (p.x + p.w > V_WIDTH - 15) p.x = V_WIDTH - 15 - p.w;
 
-      // 5. PLATFORM COLLISIONS (AABB One-way top collisions)
+      // 5. PLATFORM COLLISIONS
       p.onGround = false;
       for (const plat of lvl.platforms) {
         if (
           p.x + p.w > plat.x &&
           p.x < plat.x + plat.w &&
           p.y + p.h >= plat.y &&
-          p.y + p.h <= plat.y + 15 &&
+          p.y + p.h <= plat.y + 16 &&
           p.vy >= 0
         ) {
           p.y = plat.y - p.h;
@@ -297,7 +298,7 @@ export default function App() {
         }
       }
 
-      // 6. ANIMATION STATE
+      // 6. ANIMATION STATE DETERMINATION
       if (!p.onGround) {
         p.animState = 'jump';
       } else if (Math.abs(p.vx) > 0.1) {
@@ -306,14 +307,14 @@ export default function App() {
         p.animState = 'idle';
       }
 
-      // 7. LEVEL 2 PITFALL CHECK (Abyss / Fall detection)
+      // 7. PITFALL HAZARD CHECK
       if (p.y > lvl.pitY) {
         sound.playFall();
         loadLevel(g.level);
         return;
       }
 
-      // 8. DOOR COLLISION (Levels 1 & 2 -> Advance to next level seamlessly)
+      // 8. DOOR COLLISION (Levels 1 & 2)
       if (lvl.door) {
         const d = lvl.door;
         if (
@@ -329,7 +330,7 @@ export default function App() {
         }
       }
 
-      // 9. CHEST COLLISION (Level 3 - Treasure reached!)
+      // 9. CHEST COLLISION (Level 3 - Opens only when touched!)
       if (g.level === 3 && lvl.chest && !g.chestOpened) {
         const c = lvl.chest;
         if (
@@ -340,26 +341,25 @@ export default function App() {
         ) {
           g.chestOpened = true;
           sound.playChestOpen();
-          // Trigger Celeste / Animal Crossing style procedural voice chatter!
-          sound.playVoiceChatter(16);
+          sound.playCongratulatoryVoices();
           setTimeout(() => {
             sound.playBirthdayMelody();
-          }, 350);
-          triggerConfettiExplosion(240);
+          }, 900);
+          triggerConfettiExplosion(260);
         }
       }
 
       // 10. UPDATE CONFETTI PARTICLES
       for (let i = g.confetti.length - 1; i >= 0; i--) {
         const cp = g.confetti[i];
-        cp.vy += 0.08;
+        cp.vy += 0.1;
         cp.x += cp.vx;
         cp.y += cp.vy;
         cp.rotation += cp.vRot;
         cp.life++;
 
         if (cp.life > cp.maxLife || cp.y > V_HEIGHT + 30) {
-          if (g.chestOpened && Math.random() < 0.25) {
+          if (g.chestOpened && Math.random() < 0.28) {
             cp.y = -20;
             cp.x = Math.random() * V_WIDTH;
             cp.vy = 2 + Math.random() * 3.5;
@@ -379,134 +379,54 @@ export default function App() {
       // -------------------------------------------------------------
       ctx.clearRect(0, 0, V_WIDTH, V_HEIGHT);
 
-      // A. Atmosphere by Level
-      if (g.level === 1) {
-        const bgGrad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
-        bgGrad.addColorStop(0, '#0f172a');
-        bgGrad.addColorStop(0.7, '#1e293b');
-        bgGrad.addColorStop(1, '#090d16');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
+      // A. Starry Night Sky with Purple Sunset Gradient Horizon
+      drawNightSky(ctx, V_WIDTH, V_HEIGHT, g.frameCounter, g.level === 2);
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
-        ctx.beginPath();
-        ctx.arc(140, 110, 50, 0, Math.PI * 2);
-        ctx.arc(180, 95, 60, 0, Math.PI * 2);
-        ctx.arc(230, 110, 45, 0, Math.PI * 2);
-        ctx.fill();
+      // B. Distant and Midground Pixel Mountains
+      drawMountainRanges(ctx, V_WIDTH, 430);
 
-        ctx.beginPath();
-        ctx.arc(580, 80, 40, 0, Math.PI * 2);
-        ctx.arc(620, 70, 50, 0, Math.PI * 2);
-        ctx.arc(660, 80, 40, 0, Math.PI * 2);
-        ctx.fill();
-      } else if (g.level === 2) {
-        const bgGrad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
-        bgGrad.addColorStop(0, '#180d24');
-        bgGrad.addColorStop(0.7, '#2e1065');
-        bgGrad.addColorStop(1, '#450a0a');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
+      // C. Pine Forest Silhouettes
+      drawPineForest(ctx, V_WIDTH, 430);
 
-        const pitGlow = ctx.createLinearGradient(0, 385, 0, V_HEIGHT);
-        pitGlow.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
-        pitGlow.addColorStop(0.4, 'rgba(220, 38, 38, 0.7)');
+      // Level 2 Abyss Lava Glow
+      if (g.level === 2) {
+        const pitGlow = ctx.createLinearGradient(0, 440, 0, V_HEIGHT);
+        pitGlow.addColorStop(0, 'rgba(239, 68, 68, 0.35)');
+        pitGlow.addColorStop(0.5, 'rgba(220, 38, 38, 0.85)');
         pitGlow.addColorStop(1, '#7f1d1d');
         ctx.fillStyle = pitGlow;
-        ctx.fillRect(0, 385, V_WIDTH, V_HEIGHT - 385);
+        ctx.fillRect(0, 440, V_WIDTH, V_HEIGHT - 440);
 
         ctx.fillStyle = '#ef4444';
-        for (let x = 10; x < V_WIDTH; x += 28) {
+        for (let x = 10; x < V_WIDTH; x += 26) {
           ctx.beginPath();
           ctx.moveTo(x, V_HEIGHT);
-          ctx.lineTo(x + 14, V_HEIGHT - 26);
-          ctx.lineTo(x + 28, V_HEIGHT);
-          ctx.fill();
-        }
-      } else {
-        const bgGrad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
-        bgGrad.addColorStop(0, '#1e1b4b');
-        bgGrad.addColorStop(0.6, '#312e81');
-        bgGrad.addColorStop(1, '#1e1136');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
-
-        const garlandColors = ['#f43f5e', '#3b82f6', '#facc15', '#10b981', '#a855f7', '#fb923c'];
-        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(30, 32);
-        ctx.quadraticCurveTo(V_WIDTH / 2, 50, V_WIDTH - 30, 32);
-        ctx.stroke();
-
-        for (let i = 0; i < 17; i++) {
-          const gx = 45 + i * 42;
-          const gy = 34 + Math.sin((i / 16) * Math.PI) * 12;
-          ctx.fillStyle = garlandColors[i % garlandColors.length];
-          ctx.beginPath();
-          ctx.moveTo(gx, gy);
-          ctx.lineTo(gx + 32, gy);
-          ctx.lineTo(gx + 16, gy + 28);
-          ctx.closePath();
+          ctx.lineTo(x + 13, V_HEIGHT - 28);
+          ctx.lineTo(x + 26, V_HEIGHT);
           ctx.fill();
         }
       }
 
-      // B. Platforms
+      // D. Ground and Platforms with lush green pixel grass & cobblestone blocks
       for (const plat of lvl.platforms) {
-        ctx.fillStyle = plat.color;
-        ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
-
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
-        ctx.fillRect(plat.x, plat.y, plat.w, 4);
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
-        ctx.fillRect(plat.x, plat.y + plat.h - 4, plat.w, 4);
-
-        ctx.strokeStyle = 'rgba(0,0,0,0.4)';
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(plat.x, plat.y, plat.w, plat.h);
+        drawPixelGround(
+          ctx,
+          plat.x,
+          plat.y,
+          plat.w,
+          plat.h,
+          plat.type === 'ground',
+          g.frameCounter
+        );
       }
 
-      // C. Door (Levels 1 & 2)
+      // E. Door (Levels 1 & 2)
       if (lvl.door) {
         drawDoor(ctx, lvl.door.x, lvl.door.y, lvl.door.w, lvl.door.h, g.frameCounter);
       }
 
-      // D. Level 3 Party Hall: Two Monster NPCs appear ONLY when treasure is reached!
+      // F. Level 3: Animated Chest & Companions Dude and Owlet
       if (g.level === 3) {
-        if (g.chestOpened) {
-          // NPC 1 (Dude - blue): Left monster with balloons facing right towards chest!
-          drawMonsterNPC(
-            ctx,
-            230,
-            346,
-            32,
-            34,
-            npc1,
-            g.frameCounter,
-            '¡Sorpresa!',
-            true,
-            true,
-            'right'
-          );
-
-          // NPC 2 (Owlet - grey): Right monster with balloons facing left towards chest!
-          drawMonsterNPC(
-            ctx,
-            530,
-            346,
-            32,
-            34,
-            npc2,
-            g.frameCounter,
-            '¡Feliz Cumple!',
-            true,
-            true,
-            'left'
-          );
-        }
-
         // Birthday Chest
         if (lvl.chest) {
           drawChest(
@@ -519,9 +439,43 @@ export default function App() {
             g.frameCounter
           );
         }
+
+        // Two Monster NPCs appear celebrating ONLY when the chest is opened!
+        // Both placed at y: 382 so their feet are on the ground at y: 430, perfectly aligned with player!
+        if (g.chestOpened) {
+          // NPC 1: Dude Monster (Blue) on left with striped cone hat, yellow balloon, bubble "¡Sorpresa!"
+          drawMonsterNPC(
+            ctx,
+            130,
+            382,
+            44,
+            48,
+            npc1,
+            g.frameCounter,
+            '¡Sorpresa!',
+            true,
+            true,
+            'right'
+          );
+
+          // NPC 2: Owlet Monster (White/Grey) on right with purple cone hat, purple balloon, bubble "¡Feliz Cumple!"
+          drawMonsterNPC(
+            ctx,
+            406,
+            382,
+            44,
+            48,
+            npc2,
+            g.frameCounter,
+            '¡Feliz Cumple!',
+            true,
+            true,
+            'left'
+          );
+        }
       }
 
-      // E. Render Player Monster (Leslie - Pink Monster)
+      // G. Render Player Monster (Leslie - Pink Monster)
       drawMonsterCharacter(
         ctx,
         p.x,
@@ -534,7 +488,7 @@ export default function App() {
         p.animFrame
       );
 
-      // F. Render Confetti
+      // H. Render Confetti
       for (const cp of g.confetti) {
         ctx.save();
         ctx.translate(cp.x, cp.y);
@@ -546,8 +500,8 @@ export default function App() {
           ctx.arc(0, 0, cp.size / 2, 0, Math.PI * 2);
           ctx.fill();
         } else if (cp.shape === 'star') {
-          ctx.fillRect(-cp.size / 2, -1.5, cp.size, 3);
-          ctx.fillRect(-1.5, -cp.size / 2, 3, cp.size);
+          ctx.fillRect(-cp.size / 2, -2, cp.size, 4);
+          ctx.fillRect(-2, -cp.size / 2, 4, cp.size);
         } else {
           ctx.fillRect(-cp.size / 2, -cp.size / 3, cp.size, (cp.size * 2) / 3);
         }
@@ -555,128 +509,173 @@ export default function App() {
         ctx.restore();
       }
 
-      // G. Dynamic In-game HUD with Pixel Art Typography
-      ctx.textAlign = 'center';
-      if (g.level === 1) {
-        // Pixel Art Tutorial Text
-        ctx.font = '10px "Press Start 2P", monospace';
-        ctx.fillStyle = '#050811';
-        ctx.fillText('Usa ◀ ▶ para moverte y ▲ / ESPACIO para saltar', V_WIDTH / 2 + 1, 61);
-        ctx.fillStyle = '#f8fafc';
-        ctx.fillText('Usa ◀ ▶ para moverte y ▲ / ESPACIO para saltar', V_WIDTH / 2, 60);
-
-        ctx.font = '8px "Press Start 2P", monospace';
-        ctx.fillStyle = '#050811';
-        ctx.fillText('▶ Llega a la puerta dorada de la derecha ▶', V_WIDTH / 2 + 1, 89);
-        ctx.fillStyle = '#38bdf8';
-        ctx.fillText('▶ Llega a la puerta dorada de la derecha ▶', V_WIDTH / 2, 88);
-      } else if (g.level === 2) {
-        ctx.font = '10px "Press Start 2P", monospace';
-        ctx.fillStyle = '#050811';
-        ctx.fillText('¡CUIDADO CON EL FOSO DE LAVA!', V_WIDTH / 2 + 1, 61);
-        ctx.fillStyle = '#f87171';
-        ctx.fillText('¡CUIDADO CON EL FOSO DE LAVA!', V_WIDTH / 2, 60);
-
-        ctx.font = '8px "Press Start 2P", monospace';
-        ctx.fillStyle = '#050811';
-        ctx.fillText('Salta con precision entre las 3 plataformas', V_WIDTH / 2 + 1, 85);
-        ctx.fillStyle = '#cbd5e1';
-        ctx.fillText('Salta con precision entre las 3 plataformas', V_WIDTH / 2, 84);
-      } else if (g.level === 3) {
+      // I. Header & Level Overlay
+      if (g.level === 3) {
+        ctx.save();
         if (!g.chestOpened) {
-          ctx.font = '11px "Press Start 2P", monospace';
-          ctx.fillStyle = '#050811';
-          ctx.fillText('¡TOCA EL COFRE DORADO EN EL CENTRO!', V_WIDTH / 2 + 1, 71);
-          ctx.fillStyle = '#facc15';
-          ctx.fillText('¡TOCA EL COFRE DORADO EN EL CENTRO!', V_WIDTH / 2, 70);
+          // Guidance before chest is opened
+          ctx.textAlign = 'center';
 
-          const bounce = Math.sin(g.frameCounter * 0.1) * 6;
+          // LVL 3 Badge in rounded purple box
+          const badgeX = 35;
+          const badgeY = 25;
+          const badgeW = 75;
+          const badgeH = 28;
+          ctx.fillStyle = '#1e0838';
+          ctx.beginPath();
+          ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 8);
+          ctx.fill();
+          ctx.strokeStyle = '#8b5cf6';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          ctx.fillStyle = '#fde047';
+          ctx.font = 'bold 10px "Press Start 2P", monospace';
+          ctx.fillText('LVL 3', badgeX + badgeW / 2, badgeY + 18);
+
+          ctx.fillStyle = '#fbbf24';
+          ctx.font = 'bold 13px "Press Start 2P", monospace';
+          ctx.textAlign = 'left';
+          ctx.fillText('¡ABRE EL COFRE DORADO! 🎁', badgeX + badgeW + 12, badgeY + 20);
+
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#f8fafc';
+          ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
+          ctx.fillText('Camina hacia el cofre para descubrir la sorpresa', V_WIDTH / 2, badgeY + 54);
+
+          // Animated arrow pointing directly down to the chest
+          const bounce = Math.sin(g.frameCounter * 0.12) * 6;
           ctx.fillStyle = '#fbbf24';
           ctx.beginPath();
-          ctx.moveTo(V_WIDTH / 2, 285 + bounce);
-          ctx.lineTo(V_WIDTH / 2 - 12, 270 + bounce);
-          ctx.lineTo(V_WIDTH / 2 + 12, 270 + bounce);
+          ctx.moveTo(V_WIDTH / 2, 335 + bounce);
+          ctx.lineTo(V_WIDTH / 2 - 12, 318 + bounce);
+          ctx.lineTo(V_WIDTH / 2 + 12, 318 + bounce);
           ctx.closePath();
           ctx.fill();
         } else {
-          // CELEBRATION OVERLAY BANNER FOR LESLIE (Wider & Personalized Card)
-          ctx.save();
+          // CELEBRATION CARD FOR LESLIE (Fades in ONLY after chest is opened!)
           ctx.globalAlpha = g.messageAlpha;
+          ctx.textAlign = 'center';
 
-          const cardW = 690;
-          const cardH = 175;
-          const cardX = V_WIDTH / 2 - cardW / 2;
-          const cardY = 24;
-
-          // Card Background & Glowing Border
-          ctx.fillStyle = 'rgba(3, 7, 18, 0.95)';
+          // 1. LVL 3 Badge in rounded purple box
+          const badgeX = 35;
+          const badgeY = 25;
+          const badgeW = 75;
+          const badgeH = 28;
+          ctx.fillStyle = '#1e0838';
           ctx.beginPath();
-          ctx.roundRect(cardX, cardY, cardW, cardH, 14);
+          ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 8);
           ctx.fill();
-
-          ctx.strokeStyle = '#f59e0b';
-          ctx.lineWidth = 3;
+          ctx.strokeStyle = '#8b5cf6';
+          ctx.lineWidth = 1.5;
           ctx.stroke();
 
-          ctx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(cardX + 4, cardY + 4, cardW - 8, cardH - 8);
+          ctx.fillStyle = '#fde047';
+          ctx.font = 'bold 10px "Press Start 2P", monospace';
+          ctx.fillText('LVL 3', badgeX + badgeW / 2, badgeY + 18);
 
-          // Card Title
+          // 2. Title: ¡FELIZ CUMPLEAÑOS LESLIE! 🎊
           ctx.fillStyle = '#fbbf24';
-          ctx.font = 'bold 17px "Press Start 2P", monospace';
-          ctx.fillText('¡FELIZ CUMPLEAÑOS LESLIE! 🎉', V_WIDTH / 2, cardY + 36);
+          ctx.font = 'bold 15px "Press Start 2P", monospace';
+          ctx.textAlign = 'left';
+          ctx.fillText('¡FELIZ CUMPLEAÑOS LESLIE! 🎉', badgeX + badgeW + 12, badgeY + 20);
 
-          // Personalized message lines
+          // 3. Subtitles
+          ctx.textAlign = 'center';
           ctx.fillStyle = '#f8fafc';
-          ctx.font = '600 13px "Plus Jakarta Sans", sans-serif';
-          ctx.fillText(
-            'Leslie, otro nivel desbloqueado en esta aventura que es tu vida.',
-            V_WIDTH / 2,
-            cardY + 68
-          );
-          ctx.fillText(
-            'Te deseo lo mejor, gracias por ser tan buena amiga, nunca cambies tu forma de ser.',
-            V_WIDTH / 2,
-            cardY + 92
-          );
+          ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
+          ctx.fillText('Leslie, otro nivel desbloqueado en esta aventura que es tu vida.', V_WIDTH / 2, badgeY + 54);
+          ctx.fillText('Te deseo lo mejor, gracias por ser tan buena amiga, nunca cambies tu forma de ser.', V_WIDTH / 2, badgeY + 72);
 
-          // Tiger Claw coupon badge
-          ctx.fillStyle = 'rgba(244, 63, 94, 0.2)';
+          // 4. Pink Coupon Capsule
+          const coupW = V_WIDTH - 70;
+          const coupH = 30;
+          const coupX = 35;
+          const coupY = badgeY + 86;
+
+          ctx.fillStyle = 'rgba(112, 26, 117, 0.35)';
           ctx.beginPath();
-          ctx.roundRect(cardX + 28, cardY + 114, cardW - 56, 38, 8);
+          ctx.roundRect(coupX, coupY, coupW, coupH, 8);
           ctx.fill();
-          ctx.strokeStyle = 'rgba(244, 63, 94, 0.65)';
+          ctx.strokeStyle = 'rgba(216, 70, 239, 0.6)';
           ctx.lineWidth = 1.2;
           ctx.stroke();
 
-          ctx.fillStyle = '#fda4af';
-          ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
-          ctx.fillText(
-            '🎟️ Nota: cupón válido para hacerle una garra del tigre al goldo <3',
-            V_WIDTH / 2,
-            cardY + 138
-          );
-
-          ctx.restore();
+          ctx.fillStyle = '#f472b6';
+          ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+          ctx.fillText('♥  Nota: cupón válido para hacerle una garra del tigre al goldo <3', V_WIDTH / 2, coupY + 19);
         }
+        ctx.restore();
+      } else if (g.level === 1) {
+        ctx.save();
+        ctx.textAlign = 'center';
+        // LVL 1 Badge
+        ctx.fillStyle = '#1e0838';
+        ctx.beginPath();
+        ctx.roundRect(35, 25, 75, 28, 8);
+        ctx.fill();
+        ctx.strokeStyle = '#8b5cf6';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.fillStyle = '#fde047';
+        ctx.font = 'bold 10px "Press Start 2P", monospace';
+        ctx.fillText('LVL 1', 72, 43);
+
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = 'bold 13px "Press Start 2P", monospace';
+        ctx.fillText('NIVEL 1: TUTORIAL 🌲', 122, 44);
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('Usa ◀ ▶ para moverte y ▲ para saltar', V_WIDTH / 2, 78);
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('▶ Entra por la puerta para avanzar de nivel ▶', V_WIDTH / 2, 98);
+        ctx.restore();
+      } else if (g.level === 2) {
+        ctx.save();
+        ctx.textAlign = 'center';
+        // LVL 2 Badge
+        ctx.fillStyle = '#1e0838';
+        ctx.beginPath();
+        ctx.roundRect(35, 25, 75, 28, 8);
+        ctx.fill();
+        ctx.strokeStyle = '#8b5cf6';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.fillStyle = '#fde047';
+        ctx.font = 'bold 10px "Press Start 2P", monospace';
+        ctx.fillText('LVL 2', 72, 43);
+
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#f87171';
+        ctx.font = 'bold 13px "Press Start 2P", monospace';
+        ctx.fillText('NIVEL 2: DESAFÍO 🔥', 122, 44);
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('¡Cuidado con el foso de lava! Salta con precisión', V_WIDTH / 2, 78);
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('Llega a la puerta superior para desbloquear el gran final', V_WIDTH / 2, 98);
+        ctx.restore();
       }
+
+      animId = requestAnimationFrame(gameLoop);
     };
 
     animId = requestAnimationFrame(gameLoop);
     return () => cancelAnimationFrame(animId);
   }, []);
 
-  // Touch control handlers for gamepad
+  // Touch handlers
   const handleTouchStart = (key: 'left' | 'right' | 'jump') => (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
-    if (soundEnabled) sound.setEnabled(true);
     inputRef.current[key] = true;
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-      try {
-        navigator.vibrate(12);
-      } catch {}
-    }
+    if (navigator.vibrate) navigator.vibrate(15);
   };
 
   const handleTouchEnd = (key: 'left' | 'right' | 'jump') => (e: React.TouchEvent | React.MouseEvent) => {
@@ -685,31 +684,31 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-slate-100 flex flex-col items-center justify-start sm:justify-center p-2 sm:p-4 select-none touch-none">
+    <div className="h-[100dvh] w-full bg-[#080b14] text-slate-100 flex flex-col items-center justify-between p-1 sm:p-2 select-none touch-none overflow-hidden font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Handheld Vertical Console Chassis */}
-      <div className="w-full max-w-md bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border-2 sm:border-4 border-slate-800 rounded-3xl p-3 sm:p-4 shadow-2xl flex flex-col gap-3">
+      <div className="w-full max-w-lg h-[95dvh] sm:h-[97dvh] bg-[#0c1020] border-2 border-slate-800/80 rounded-3xl p-2.5 sm:p-3.5 shadow-2xl flex flex-col justify-between overflow-hidden">
         
-        {/* Minimal Console Bezel Top Header */}
-        <div className="flex items-center justify-between px-1 text-xs">
+        {/* Top Console Bezel Header */}
+        <div className="flex items-center justify-between px-2 py-1 text-xs shrink-0">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
-            <span className="font-['Press_Start_2P'] text-[9px] text-slate-400 tracking-wider">
+            <span className="w-3 h-3 rounded-full bg-[#10b981] shadow-[0_0_10px_#10b981]" />
+            <span className="font-['Press_Start_2P'] text-[10px] sm:text-[11px] text-white tracking-wider">
               RETRO BOY 2D
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5">
-            {/* Level Quick Jump */}
-            <div className="flex items-center bg-slate-950 border border-slate-800 rounded-lg p-0.5">
+          <div className="flex items-center gap-2">
+            {/* Level Selector Capsule */}
+            <div className="flex items-center bg-[#070a14] border border-slate-800 rounded-xl p-0.5">
               {[1, 2, 3].map((lvl) => (
                 <button
                   key={lvl}
                   onClick={() => loadLevel(lvl)}
                   aria-label={`Ir al Nivel ${lvl}`}
-                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
+                  className={`px-3 py-1 rounded-lg font-['Press_Start_2P'] text-[9px] transition-all cursor-pointer ${
                     currentLevel === lvl
-                      ? 'bg-rose-600 text-white shadow-sm'
-                      : 'text-slate-500 hover:text-slate-300'
+                      ? 'bg-[#8b5cf6] text-white shadow-[0_0_12px_rgba(139,92,246,0.7)] font-bold'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   L{lvl}
@@ -717,87 +716,84 @@ export default function App() {
               ))}
             </div>
 
-            {/* Sound Toggle */}
+            {/* Sound Toggle Button */}
             <button
               onClick={toggleSound}
               aria-label={soundEnabled ? 'Silenciar sonido' : 'Activar sonido'}
-              className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition"
+              className="p-2 rounded-xl bg-[#070a14] border border-slate-800 text-[#34d399] hover:bg-slate-800 transition cursor-pointer"
               title={soundEnabled ? 'Silenciar' : 'Activar sonido'}
             >
-              {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-emerald-400" /> : <VolumeX className="w-3.5 h-3.5 text-rose-400" />}
+              {soundEnabled ? <Volume2 className="w-4 h-4 text-[#34d399]" /> : <VolumeX className="w-4 h-4 text-rose-400" />}
             </button>
 
-            {/* Restart Level */}
+            {/* Restart Entire Game directly to Level 1 */}
             <button
-              onClick={() => loadLevel(currentLevel)}
-              className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition"
-              title="Reiniciar Nivel (Tecla R)"
+              onClick={handleFullRestart}
+              className="p-2 rounded-xl bg-[#070a14] border border-slate-800 text-[#38bdf8] hover:bg-slate-800 transition cursor-pointer"
+              title="Reiniciar juego completo desde el Nivel 1 (Tecla R)"
             >
-              <RotateCcw className="w-3.5 h-3.5 text-sky-400" />
+              <RotateCcw className="w-4 h-4 text-[#38bdf8]" />
+            </button>
+
+            {/* Standalone HTML Download Button */}
+            <button
+              onClick={handleDownloadStandalone}
+              className="p-2 rounded-xl bg-[#070a14] border border-slate-800 text-sky-400 hover:bg-slate-800 transition cursor-pointer"
+              title="Descargar index.html autónomo"
+            >
+              <Download className="w-4 h-4 text-sky-400" />
             </button>
           </div>
         </div>
 
-        {/* Dedicated Clean Screen (NO BUTTONS OVERLAYING THE CANVAS!) */}
-        <div className="relative w-full aspect-[16/9] bg-slate-950 border-2 border-slate-800/90 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center">
+        {/* Dedicated Game Screen with Sleek Dark Border */}
+        <div className="relative flex-1 min-h-0 w-full bg-[#070a14] border-2 border-purple-950/70 rounded-2xl overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] flex items-center justify-center my-1.5">
           <canvas
             ref={canvasRef}
             width={V_WIDTH}
             height={V_HEIGHT}
-            className="w-full h-full block"
+            className="w-full h-full object-contain block"
           />
-
-          {/* Level Badge in top-left of screen */}
-          <div className="absolute top-2 left-2 pointer-events-none">
-            <span className="px-2 py-0.5 bg-slate-950/80 border border-slate-700/60 rounded text-[9px] font-bold text-amber-400 font-['Press_Start_2P']">
-              LVL {currentLevel}
-            </span>
-          </div>
         </div>
 
-        {/* Dedicated Bottom Retro Gamepad Controller */}
-        <div className="bg-slate-950/90 border border-slate-800 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2 shadow-lg">
-          {/* Left: Pixel Art D-Pad (◀ ▶) */}
-          <div className="flex items-center gap-2">
-            <button
-              onTouchStart={handleTouchStart('left')}
-              onTouchEnd={handleTouchEnd('left')}
-              onMouseDown={handleTouchStart('left')}
-              onMouseUp={handleTouchEnd('left')}
-              onMouseLeave={handleTouchEnd('left')}
-              aria-label="Mover a la izquierda"
-              className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border-2 border-slate-600 active:border-cyan-400 active:from-cyan-900 active:to-slate-900 active:scale-95 text-slate-200 active:text-cyan-300 font-bold text-2xl flex items-center justify-center shadow-lg transition-transform touch-manipulation select-none"
-            >
-              ◀
-            </button>
+        {/* Clean, Ergonomic Gamepad Dock (Fixed firmly at the very bottom, without center Leslie box or footer pills) */}
+        <div className="w-full mt-auto shrink-0 flex items-stretch justify-between gap-3 pb-safe pt-2">
+          
+          {/* Left: Purple D-Pad with ◀ MOVER ▶ */}
+          <div className="flex-1 max-w-[210px] bg-[#0c1020] border-2 border-[#3b0764] rounded-2xl p-2.5 flex flex-col items-center justify-center gap-1.5 shadow-lg">
+            <div className="flex items-center gap-2.5">
+              <button
+                onTouchStart={handleTouchStart('left')}
+                onTouchEnd={handleTouchEnd('left')}
+                onMouseDown={handleTouchStart('left')}
+                onMouseUp={handleTouchEnd('left')}
+                onMouseLeave={handleTouchEnd('left')}
+                aria-label="Mover a la izquierda"
+                className="w-16 h-16 sm:w-18 sm:h-18 rounded-xl bg-gradient-to-b from-[#6b21a8] to-[#4c1d95] border border-[#a855f7]/70 active:scale-95 active:border-cyan-400 text-white font-bold text-2xl flex items-center justify-center shadow-[0_4px_12px_rgba(107,33,168,0.5)] transition-transform touch-manipulation select-none cursor-pointer"
+              >
+                ⬅
+              </button>
 
-            <button
-              onTouchStart={handleTouchStart('right')}
-              onTouchEnd={handleTouchEnd('right')}
-              onMouseDown={handleTouchStart('right')}
-              onMouseUp={handleTouchEnd('right')}
-              onMouseLeave={handleTouchEnd('right')}
-              aria-label="Mover a la derecha"
-              className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border-2 border-slate-600 active:border-cyan-400 active:from-cyan-900 active:to-slate-900 active:scale-95 text-slate-200 active:text-cyan-300 font-bold text-2xl flex items-center justify-center shadow-lg transition-transform touch-manipulation select-none"
-            >
-              ▶
-            </button>
-          </div>
-
-          {/* Center: Retro Console Accents */}
-          <div className="flex flex-col items-center justify-center gap-1.5 opacity-60">
-            <div className="flex gap-1">
-              <span className="w-1 h-5 bg-slate-700 rounded-full rotate-12" />
-              <span className="w-1 h-5 bg-slate-700 rounded-full rotate-12" />
-              <span className="w-1 h-5 bg-slate-700 rounded-full rotate-12" />
+              <button
+                onTouchStart={handleTouchStart('right')}
+                onTouchEnd={handleTouchEnd('right')}
+                onMouseDown={handleTouchStart('right')}
+                onMouseUp={handleTouchEnd('right')}
+                onMouseLeave={handleTouchEnd('right')}
+                aria-label="Mover a la derecha"
+                className="w-16 h-16 sm:w-18 sm:h-18 rounded-xl bg-gradient-to-b from-[#6b21a8] to-[#4c1d95] border border-[#a855f7]/70 active:scale-95 active:border-cyan-400 text-white font-bold text-2xl flex items-center justify-center shadow-[0_4px_12px_rgba(107,33,168,0.5)] transition-transform touch-manipulation select-none cursor-pointer"
+              >
+                ➡
+              </button>
             </div>
-            <span className="font-['Press_Start_2P'] text-[7px] text-slate-500 tracking-wider">
-              LESLIE
+
+            <span className="font-['Press_Start_2P'] text-[8px] text-[#c084fc] tracking-wider">
+              ◀ MOVER ▶
             </span>
           </div>
 
-          {/* Right: Retro Jump Action Button */}
-          <div className="flex flex-col items-center gap-1">
+          {/* Right: Glowing Green SALTO [SPACE] Button */}
+          <div className="flex-1 max-w-[210px] bg-[#0c1020] border-2 border-[#064e3b] rounded-2xl p-2.5 flex flex-col items-center justify-center gap-1.5 shadow-lg">
             <button
               onTouchStart={handleTouchStart('jump')}
               onTouchEnd={handleTouchEnd('jump')}
@@ -805,29 +801,22 @@ export default function App() {
               onMouseUp={handleTouchEnd('jump')}
               onMouseLeave={handleTouchEnd('jump')}
               aria-label="Saltar"
-              className="w-20 h-16 sm:w-24 sm:h-18 rounded-2xl bg-gradient-to-b from-emerald-600 to-emerald-800 border-2 border-emerald-400 active:border-emerald-200 active:from-emerald-500 active:to-emerald-700 active:scale-95 text-white font-['Press_Start_2P'] text-[11px] flex flex-col items-center justify-center gap-1 shadow-lg shadow-emerald-950 transition-transform touch-manipulation select-none"
+              className="w-full h-16 sm:h-18 rounded-xl bg-gradient-to-b from-[#10b981] to-[#059669] border border-[#34d399] active:scale-95 text-white flex flex-col items-center justify-center shadow-[0_0_18px_rgba(16,185,129,0.55)] transition-transform touch-manipulation select-none cursor-pointer"
             >
-              <span className="text-base leading-none">▲</span>
-              <span>SALTO</span>
+              <span className="text-sm leading-none">▲</span>
+              <span className="font-['Press_Start_2P'] text-sm tracking-wider font-extrabold">
+                SALTO
+              </span>
             </button>
-          </div>
-        </div>
 
-        {/* Footer info & Download single-file button */}
-        <div className="flex items-center justify-between px-1 pt-1 text-[11px] text-slate-500">
-          <span>Controles: Flechas + Espacio</span>
-          <button
-            onClick={handleDownloadStandalone}
-            className="flex items-center gap-1 text-slate-400 hover:text-indigo-400 transition"
-            title="Descargar versión autónoma index.html"
-          >
-            <Download className="w-3 h-3" />
-            <span>Descargar index.html</span>
-          </button>
+            <span className="font-['Press_Start_2P'] text-[8px] text-[#34d399] tracking-wider">
+              — SPACE —
+            </span>
+          </div>
+
         </div>
 
       </div>
     </div>
   );
 }
-

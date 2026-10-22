@@ -1,67 +1,68 @@
-# Plan de Rediseño Móvil Vertical, Protagonista Leslie y Mejoras Audiovisuales
+# Plan de Implementación: Rediseño Visual de Escenarios y Mando según Imagen de Referencia
 
-Este plan detalla la reestructuración completa de la experiencia para adaptarse a la pantalla vertical de dispositivos móviles inspirada en una consola retro portátil, asignando a **Pink Monster** como la protagonista oficial (**Leslie**), liberando el área de juego de botones invasivos y añadiendo voces chiptune 8-bits y un mensaje personalizado ampliado.
-
----
-
-## 1. Mockup Visual de la Nueva Experiencia
-
-A continuación se muestra el concepto visual demo generado para la vista vertical:
-
-![Demo de Consola Portátil Retro](/src/assets/images/mobile_retro_layout_1792700962992.jpg)
-
-*Estructura: Pantalla de juego en la parte superior totalmente despejada, y botonera arcade dedicada en la parte inferior con D-Pad a la izquierda y botón de salto a la derecha.*
+Adaptar fielmente el diseño de los escenarios del juego y la interfaz del mando basándose en la imagen de referencia compartida (`image_a6c7915f.png`), incluyendo el paisaje nocturno con siluetas de montañas y bosque de pinos, suelo de hierba pixel art con rocas y flores, el portal dorado de luz en el Nivel 3, y la botonera morada con corazones y botón verde de salto.
 
 ---
 
-## 2. Puntos Clave del Rediseño
+## 1. Rediseño de Escenarios Pixel Art (Fondo, Suelo y Plataformas)
 
-### A. Estructura Vertical y Reubicación de Controles (Cero Obstrucción)
-- **Eliminación de la barra superior**: Se suprime la cabecera anterior tachada en la captura del usuario. En su lugar, el juego ocupará de forma limpia la parte superior con un marco arcade estilizado.
-- **Botonera inferior dedicada (Handheld / Gamepad)**:
-  - Los botones táctiles ya no flotarán sobre el suelo ni sobre el jugador.
-  - Se crea una zona de control inferior separada del canvas:
-    - **Lado izquierdo**: Controles direccionales pixel art (**◀** y **▶**) con relieve retro, textura táctil y feedback visual de pulsación.
-    - **Lado derecho**: Botón de acción grande circular/retro (**▲ SALTO**) en tono verde esmeralda arcade.
-    - **Barra de servicio discreta**: Botón miniatura de sonido (**🔊/🔇**), reinicio (**↺**) y descarga del archivo único, ubicados entre la pantalla y la botonera.
-  - Funciona de forma totalmente responsiva en móviles verticales y en computadoras de escritorio.
-
-### B. Protagonista Oficial: Pink Monster (Leslie)
-- **Leslie es la protagonista**: El personaje jugable principal queda configurado por defecto como **Pink Monster** (monstruo rosa con orejitas y pancita blanca).
-- **NPCs del Nivel 3**: Los dos amigos que le preparan la fiesta sorpresa y saltan al abrir el cofre serán **Dude Monster** (azul) y **Owlet Monster** (lechuza encapuchada), ambos con gorros cónicos de cumpleaños y globos festivos flotantes.
-
-### C. Tipografía Pixel Art en el Nivel 1 (Tutorial)
-- Sustituir la tipografía estándar por la fuente retro `'Press Start 2P', monospace` en los textos dentro del canvas:
-  - Nivel 1: *"Usa Flechas o D-Pad para moverte y ESPACIO o SALTO para saltar"*.
-  - Indicador de puerta y consejos en estilo arcade con sombra pixelada.
-
-### D. Sonido de Voces Pixel Art 8-Bits (Estilo Animal Crossing / Celeste)
-- Añadir a `SoundEngine` un sintetizador procedural de fonemas / balbuceos (*speech chirps*):
-  - Ráfagas micro-moduladas de ondas cuadradas/triangulares con fluctuaciones aleatorias de tono armónico, recreando la clásica voz chiptune cuando los personajes saltan y cuando se revela el mensaje final.
-  - Se reproduce automáticamente en el Nivel 3 al destapar el cofre, como grito de alegría y sorpresa de sus amigos.
-
-### E. Mensaje de Cumpleaños Personalizado Ampliado
-- Rediseñar el banner/pergamino final de celebración dentro de la pantalla para que sea más amplio, con borde dorado pixel art y fondo elegante semitransparente:
-  - **Título**: `"🎉 ¡FELIZ CUMPLEAÑOS LESLIE! 🎂"`
-  - **Cuerpo del mensaje**:
-    > *"Leslie, otro nivel desbloqueado en esta aventura que es tu vida, te deseo lo mejor gracias por ser tan buena amiga, nunca cambies tu forma de ser."*
-  - **Nota especial**:
-    > *"Nota: cupón válido para hacerle una garra del tigre al goldo <3"*
-  - Con lluvia de confeti continua y destellos dorados del cofre.
+- **Cielo Nocturno con Degradado y Estrellas**:
+  - Degradado atmosférico de azul noche profundo a violeta y resplandor crepuscular en el horizonte (`#0d0221` → `#2e1065` → `#581c87`).
+  - Estrellas pixeladas titilantes (cruces y puntos) y una estrella fugaz animada cruzando el firmamento periódicamente.
+- **Capas de Montañas y Siluetas de Bosque**:
+  - Capa lejana de cordilleras montañosas en violeta oscuro/índigo (`#240046`).
+  - Capa media de montañas con aristas de luz pixel art (`#3c096c` / `#5a189a`).
+  - Línea de bosque de pinos en silueta sobre el horizonte antes del suelo.
+- **Suelo y Bloques de Tierra Pixel Art**:
+  - Reemplazar las plataformas planas por bloques de tierra detallados:
+    - Borde superior de césped verde brillante (`#22c55e`, `#16a34a`) con briznas irregulares y pequeñas flores violetas y amarillas esparcidas.
+    - Bloques de tierra/roca subterránea con textura de piedra pixel art orgánica (`#451a03`, `#78350f`).
+- **Nivel 2 (Desafío del Foso)**:
+  - Mismo entorno de montañas nocturnas, con plataformas de piedra suspendidas sobre el foso abisal con niebla/humo rojizo en el fondo.
 
 ---
 
-## 3. Plan de Implementación en Archivos
+## 2. Portal Dorado de Luz en el Nivel 3 (Sustitución del cofre)
 
-1. **`src/game/audio.ts`**:
-   - Implementar `playCharacterVoiceChatter()` con algoritmo de fonemas retro (burbujas tonales moduladas tipo Celeste/Animalese).
-2. **`src/App.tsx`**:
-   - Ajustar el contenedor general a formato vertical (`flex-col`, `max-w-md` o vertical fluido centrado).
-   - Mover los botones táctiles fuera del canvas a un panel inferior tipo mando de consola con diseño pixel art (D-Pad izquierda, botón Salto derecha).
-   - Fijar `selectedCharacter = 'pink'` y NPCs = `'dude'` y `'owlet'`.
-   - Renderizar el tutorial con fuente pixel `'Press Start 2P'`.
-   - Implementar la tarjeta amplia con el mensaje especial para Leslie.
-3. **`standalone_index.html` y `public/minijuego.html`**:
-   - Sincronizar la misma estructura vertical de consola portátil, los sonidos de voz retro y el mensaje de Leslie en la versión de archivo único descargable.
-4. **Verificación**:
-   - Compilación con `compile_applet` y validación tipográfica con `lint_applet`.
+- **Portal de Luz Mágico**:
+  - Diseñar un arco/portal dorado brillante en el centro del Nivel 3 con columnas doradas y un haz ascendente de luz cálida radiante (`#fef08a`, `#facc15`).
+  - Partículas de destellos dorados (estrellas/cruces brillantes) flotando continuamente dentro del rayo de luz.
+- **Activación del Clímax**:
+  - Cuando Leslie entra en el portal de luz:
+    - Se reproducen las voces expresivas de felicitaciones de Dude y Owlet.
+    - Dude Monster (izquierda con gorrito y globo amarillo) y Owlet Monster (derecha con gorrito y globo morado) celebran con sus bocadillos `"¡Sorpresa!"` y `"¡Feliz Cumple!"`.
+    - La tarjeta de felicitación para Leslie se despliega en la parte superior con el cupón para *"la garra del tigre al goldo <3"*.
+
+---
+
+## 3. Rediseño del Mando de Juego (Gamepad) según la Referencia
+
+- **Cabecera Superior**:
+  - Indicador LED verde brillante + tipografía pixel `RETRO BOY 2D`.
+  - Grupo de botones de nivel `L1`, `L2`, `L3` con el nivel activo resaltado en morado vibrante (`#8b5cf6`).
+  - Botón de sonido con icono verde cian y botón de reinicio circular.
+- **Panel Inferior de Controles (3 Cajas)**:
+  - **Izquierda**: Caja morada oscura con dos botones cuadrados redondeados (`#6b21a8`) con flechas blancas en cruz pixeladas y la etiqueta inferior `◀ MOVER ▶`.
+  - **Centro**: Caja con marco morado conteniendo 3 corazones pixel art morados (`♥ ♥ ♥`) sobre el nombre `LESLIE` en tipografía pixel con destellos.
+  - **Derecha**: Botón arcade verde esmeralda resplandeciente con la flecha `▲`, el texto en negrita `SALTO` y el indicador `— [SPACE] —`.
+- **Barra de Pie de Página (3 Módulos)**:
+  - Módulo 1: `? Controles: Flechas + Espacio`
+  - Módulo 2: `🎁 Tip: Explora y diviértete ¡Tú puedes con todo!`
+  - Módulo 3: `📥 Descargar index.html`
+
+---
+
+## 4. Archivos a Modificar
+
+1. `src/game/scenery.ts` (Nuevo) o `src/game/sprites.ts`: Dibujo de montañas, cielo estrellado, estrella fugaz, bosque de pinos, bloques de tierra pixel art con césped y el portal dorado de luz.
+2. `src/App.tsx`: Integración del nuevo motor de escenarios, portal dorado en Nivel 3, actualización del layout y la botonera con los corazones y colores morado/verde exactos.
+3. `standalone_index.html` y `public/minijuego.html`: Sincronización completa del nuevo diseño visual para su descarga y juego independiente.
+
+---
+
+## Verificación
+
+- Comparar visualmente con `image_a6c7915f.png`: cielo nocturno, montañas, pinos, césped, portal dorado, corazones pixel y botones.
+- Verificar que las colisiones en las plataformas de césped y la entrada al portal dorado funcionen con total fluidez.
+- Probar los controles táctiles del mando morado/verde y la versión autónoma descargable.
+- Ejecutar `compile_applet` y `lint_applet`.

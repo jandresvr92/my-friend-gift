@@ -6,7 +6,7 @@
   <title>Plataformas 2D - ¡Feliz Cumpleaños Leslie!</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -16,43 +16,46 @@
       -webkit-user-select: none;
       -webkit-touch-callout: none;
     }
-    body {
-      background: #090d16;
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #060913;
       color: #f8fafc;
       font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      overflow-x: hidden;
+      justify-content: center;
+      padding: 4px;
       touch-action: none;
-      padding: 12px 8px;
     }
-    @media (min-height: 700px) {
-      body {
-        justify-content: center;
-      }
-    }
+    /* Console Chassis */
     .console-chassis {
       position: relative;
       width: 100%;
-      max-width: 440px;
-      background: linear-gradient(180deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
-      border: 3px solid #334155;
-      border-radius: 28px;
-      padding: 14px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      max-width: 520px;
+      height: 95dvh;
+      background: linear-gradient(180deg, #0d1222 0%, #151a30 50%, #0d1120 100%);
+      border: 3px solid #1e2540;
+      border-radius: 26px;
+      padding: 10px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.04);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      justify-content: space-between;
+      overflow: hidden;
     }
+    /* Top Bar */
     .console-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 4px;
+      padding: 2px 4px 6px 4px;
       font-size: 11px;
+      flex-shrink: 0;
     }
     .console-brand {
       display: flex;
@@ -64,7 +67,7 @@
       height: 8px;
       border-radius: 50%;
       background: #10b981;
-      box-shadow: 0 0 8px #10b981;
+      box-shadow: 0 0 10px #10b981;
       animation: pulse 2s infinite;
     }
     @keyframes pulse {
@@ -73,8 +76,8 @@
     }
     .brand-text {
       font-family: 'Press Start 2P', monospace;
-      font-size: 8px;
-      color: #94a3b8;
+      font-size: 9px;
+      color: #cbd5e1;
       letter-spacing: 1px;
     }
     .console-actions {
@@ -84,178 +87,195 @@
     }
     .lvl-btn-group {
       display: flex;
-      background: #020617;
+      background: #070a14;
       border: 1px solid #1e293b;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 2px;
     }
     .lvl-btn {
       background: transparent;
       border: none;
       color: #64748b;
-      font-size: 10px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
       font-weight: bold;
-      padding: 2px 7px;
+      padding: 4px 8px;
       border-radius: 6px;
       cursor: pointer;
     }
     .lvl-btn.active {
-      background: #e11d48;
+      background: #8b5cf6;
       color: #ffffff;
+      box-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
     }
     .icon-btn {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #cbd5e1;
-      padding: 4px 8px;
-      border-radius: 8px;
+      background: #070a14;
+      border: 1px solid #1e293b;
+      color: #34d399;
+      padding: 5px 8px;
+      border-radius: 10px;
       cursor: pointer;
       font-size: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .icon-btn:hover {
-      background: #334155;
-      color: #ffffff;
+    .restart-btn {
+      background: #070a14;
+      border: 1px solid #1e293b;
+      color: #38bdf8;
+      padding: 5px 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
+    /* Screen Bezel */
     .screen-bezel {
       position: relative;
+      flex: 1;
+      min-height: 0;
       width: 100%;
-      aspect-ratio: 16 / 9;
-      background: #020617;
-      border: 2px solid #1e293b;
-      border-radius: 16px;
+      background: #070a14;
+      border: 2px solid rgba(59, 7, 100, 0.7);
+      border-radius: 18px;
       overflow: hidden;
-      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.9);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 4px 0 6px 0;
     }
     canvas {
       width: 100%;
       height: 100%;
+      object-fit: contain;
       display: block;
       image-rendering: pixelated;
     }
-    .screen-badge {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: rgba(2, 6, 23, 0.85);
-      border: 1px solid rgba(51, 65, 85, 0.8);
-      font-family: 'Press Start 2P', monospace;
-      font-size: 8px;
-      color: #facc15;
-      padding: 3px 6px;
-      border-radius: 4px;
-      pointer-events: none;
-    }
-    .gamepad-panel {
-      background: rgba(2, 6, 23, 0.9);
-      border: 1px solid #1e293b;
-      border-radius: 18px;
-      padding: 12px;
+
+    /* Ergonomic Gamepad Dock (Fixed firmly at bottom edge, 2 balanced modules) */
+    .gamepad-dock {
+      width: 100%;
+      margin-top: auto;
+      flex-shrink: 0;
       display: flex;
-      align-items: center;
+      align-items: stretch;
       justify-content: space-between;
       gap: 12px;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+      padding-top: 4px;
+      padding-bottom: env(safe-area-inset-bottom, 2px);
     }
-    .dpad-container {
+
+    /* Module 1: Left Purple D-Pad */
+    .mod-dpad {
+      flex: 1;
+      max-width: 210px;
+      background: #0c1020;
+      border: 2px solid #3b0764;
+      border-radius: 18px;
+      padding: 8px 10px;
       display: flex;
-      gap: 8px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
     }
-    .pad-btn {
-      width: 64px;
-      height: 64px;
-      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-      border: 2px solid #475569;
-      border-radius: 16px;
-      color: #e2e8f0;
-      font-size: 24px;
+    .dpad-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .purple-btn {
+      width: 62px;
+      height: 60px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #6b21a8 0%, #4c1d95 100%);
+      border: 1px solid rgba(168, 85, 247, 0.7);
+      color: #ffffff;
+      font-size: 26px;
       font-weight: bold;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 12px rgba(107, 33, 168, 0.5);
       cursor: pointer;
       touch-action: manipulation;
-      transition: transform 0.06s;
+      transition: transform 0.05s;
     }
-    .pad-btn:active, .pad-btn.active {
-      transform: scale(0.92);
+    .purple-btn:active, .purple-btn.active {
+      transform: scale(0.93);
       border-color: #38bdf8;
-      background: linear-gradient(180deg, #0284c7 0%, #0f172a 100%);
-      color: #38bdf8;
     }
-    .console-middle {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      opacity: 0.6;
-    }
-    .speaker-slits {
-      display: flex;
-      gap: 4px;
-    }
-    .slit {
-      width: 4px;
-      height: 20px;
-      background: #334155;
-      border-radius: 2px;
-      transform: rotate(15deg);
-    }
-    .console-name {
+    .mod-label-purple {
       font-family: 'Press Start 2P', monospace;
-      font-size: 6px;
-      color: #64748b;
+      font-size: 8px;
+      color: #c084fc;
+      letter-spacing: 1px;
     }
-    .jump-btn-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .btn-jump {
-      width: 76px;
-      height: 64px;
-      background: linear-gradient(180deg, #059669 0%, #064e3b 100%);
-      border: 2px solid #34d399;
+
+    /* Module 2: Right Glowing Green SALTO Button */
+    .mod-jump {
+      flex: 1;
+      max-width: 210px;
+      background: #0c1020;
+      border: 2px solid #064e3b;
       border-radius: 18px;
-      color: #ffffff;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 10px;
+      padding: 8px 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      box-shadow: 0 6px 14px rgba(6, 78, 59, 0.6);
+      gap: 6px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+    }
+    .btn-green-jump {
+      width: 100%;
+      height: 60px;
+      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+      border: 1px solid #34d399;
+      border-radius: 14px;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.55);
       cursor: pointer;
       touch-action: manipulation;
-      transition: transform 0.06s;
+      transition: transform 0.05s;
     }
-    .btn-jump:active, .btn-jump.active {
-      transform: scale(0.92);
-      background: #10b981;
-      border-color: #6ee7b7;
+    .btn-green-jump:active, .btn-green-jump.active {
+      transform: scale(0.93);
+      border-color: #a7f3d0;
     }
-    .btn-jump .icon {
-      font-size: 14px;
+    .btn-green-jump .arrow-icon {
+      font-size: 13px;
       line-height: 1;
     }
-    .footer-help {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #64748b;
-      padding: 0 4px;
+    .btn-green-jump .jump-text {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .mod-label-green {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: #34d399;
+      letter-spacing: 1px;
     }
   </style>
 </head>
 <body>
 
   <div class="console-chassis">
-    <!-- Top Console Bezel -->
+    <!-- Top Bar -->
     <div class="console-header">
       <div class="console-brand">
         <div class="power-led"></div>
@@ -268,51 +288,43 @@
           <button class="lvl-btn" id="btn-lvl-2" onclick="setLevel(2)">L2</button>
           <button class="lvl-btn" id="btn-lvl-3" onclick="setLevel(3)">L3</button>
         </div>
-        <button class="icon-btn" id="sound-btn" title="Sonido">🔊</button>
-        <button class="icon-btn" id="restart-btn" title="Reiniciar nivel (Tecla R)">↺</button>
+        <button class="icon-btn" id="sound-btn" onclick="toggleSound()" title="Sonido">🔊</button>
+        <button class="restart-btn" id="restart-btn" onclick="restartEntireGame()" title="Reiniciar desde Nivel 1 (Tecla R)">↺</button>
+        <button class="icon-btn" onclick="downloadSelf()" title="Descargar index.html" style="color: #38bdf8;">📥</button>
       </div>
     </div>
 
-    <!-- Clean Dedicated Screen (Zero buttons overlaying!) -->
+    <!-- Screen Bezel -->
     <div class="screen-bezel">
-      <canvas id="gameCanvas" width="800" height="450"></canvas>
-      <div class="screen-badge" id="screen-badge">LVL 1</div>
+      <canvas id="gameCanvas" width="580" height="520"></canvas>
     </div>
 
-    <!-- Dedicated Gamepad Console Below Screen -->
-    <div class="gamepad-panel">
-      <!-- Left: D-Pad -->
-      <div class="dpad-container">
-        <button class="pad-btn" id="btn-left" aria-label="Izquierda">◀</button>
-        <button class="pad-btn" id="btn-right" aria-label="Derecha">▶</button>
-      </div>
-
-      <!-- Center: Speaker Slits -->
-      <div class="console-middle">
-        <div class="speaker-slits">
-          <div class="slit"></div>
-          <div class="slit"></div>
-          <div class="slit"></div>
+    <!-- Gamepad Dock (Firmly on bottom edge, 2 balanced modules without center Leslie box or footer pills) -->
+    <div class="gamepad-dock">
+      <!-- Module 1: Left Purple D-Pad -->
+      <div class="mod-dpad">
+        <div class="dpad-row">
+          <button class="purple-btn" id="btn-left" aria-label="Mover izquierda">⬅</button>
+          <button class="purple-btn" id="btn-right" aria-label="Mover derecha">➡</button>
         </div>
-        <span class="console-name">LESLIE</span>
+        <span class="mod-label-purple">◀ MOVER ▶</span>
       </div>
 
-      <!-- Right: Jump Action Button -->
-      <div class="jump-btn-container">
-        <button class="btn-jump" id="btn-jump" aria-label="Saltar">
-          <span class="icon">▲</span>
-          <span>SALTO</span>
+      <!-- Module 2: Right Glowing Green SALTO Button -->
+      <div class="mod-jump">
+        <button class="btn-green-jump" id="btn-jump" aria-label="Saltar">
+          <span class="arrow-icon">▲</span>
+          <span class="jump-text">SALTO</span>
         </button>
+        <span class="mod-label-green">— SPACE —</span>
       </div>
-    </div>
-
-    <div class="footer-help">
-      <span>Controles: Flechas + Espacio</span>
-      <span>¡Feliz Cumpleaños Leslie!</span>
     </div>
   </div>
 
   <script>
+    /* =========================================================================
+       AUDIO SYNTHESIZER WITH DUAL EXPRESSIVE CONGRATULATIONS VOICES
+       ========================================================================= */
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
     let soundEnabled = true;
@@ -325,6 +337,12 @@
         audioCtx.resume();
       }
       return audioCtx;
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('sound-btn');
+      if (btn) btn.innerText = soundEnabled ? '🔊' : '🔇';
     }
 
     function playSound(type) {
@@ -385,25 +403,50 @@
           osc.start(t);
           osc.stop(t + (idx === 6 ? 0.65 : 0.16));
         });
-      } else if (type === 'voice') {
-        // Procedural 8-bit Celeste / Animal Crossing voice chatter
-        const baseFreqs = [480, 540, 620, 680, 760, 840];
-        for (let i = 0; i < 16; i++) {
+      } else if (type === 'congratulations') {
+        // Dude Monster voice: "¡Sor-pre-sa!"
+        const dude = [
+          { f: 260, d: 0.09, t: 0.00, slide: 320, type: 'square' },
+          { f: 330, d: 0.08, t: 0.08, slide: 390, type: 'triangle' },
+          { f: 392, d: 0.11, t: 0.16, slide: 490, type: 'square' },
+          { f: 523, d: 0.16, t: 0.26, slide: 587, type: 'triangle' },
+        ];
+        dude.forEach(s => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
-          const t = now + i * 0.055;
-          const duration = 0.045;
-          const freq = baseFreqs[Math.floor(Math.random() * baseFreqs.length)] + (Math.random() - 0.5) * 60;
-          osc.type = Math.random() > 0.4 ? 'square' : 'triangle';
-          osc.frequency.setValueAtTime(freq, t);
-          osc.frequency.exponentialRampToValueAtTime(freq * (0.92 + Math.random() * 0.22), t + duration);
-          gain.gain.setValueAtTime(0.11, t);
-          gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+          const st = now + s.t;
+          osc.type = s.type;
+          osc.frequency.setValueAtTime(s.f, st);
+          osc.frequency.exponentialRampToValueAtTime(s.slide, st + s.d);
+          gain.gain.setValueAtTime(0.18, st);
+          gain.gain.exponentialRampToValueAtTime(0.005, st + s.d);
           osc.connect(gain);
           gain.connect(ctx.destination);
-          osc.start(t);
-          osc.stop(t + duration + 0.01);
-        }
+          osc.start(st);
+          osc.stop(st + s.d + 0.01);
+        });
+
+        // Owlet Monster voice: "¡Fe-liz Cum-ple!"
+        const owlet = [
+          { f: 587, d: 0.08, t: 0.00, slide: 659, type: 'triangle' },
+          { f: 659, d: 0.08, t: 0.08, slide: 784, type: 'square' },
+          { f: 784, d: 0.10, t: 0.16, slide: 880, type: 'triangle' },
+          { f: 1046, d: 0.22, t: 0.25, slide: 1174, type: 'triangle' },
+        ];
+        owlet.forEach(s => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const st = now + 0.38 + s.t;
+          osc.type = s.type;
+          osc.frequency.setValueAtTime(s.f, st);
+          osc.frequency.exponentialRampToValueAtTime(s.slide, st + s.d);
+          gain.gain.setValueAtTime(0.16, st);
+          gain.gain.exponentialRampToValueAtTime(0.005, st + s.d);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(st);
+          osc.stop(st + s.d + 0.01);
+        });
       } else if (type === 'birthday') {
         const notes = [
           { f: 392, d: 0.25 }, { f: 392, d: 0.25 }, { f: 440, d: 0.45 }, { f: 392, d: 0.45 }, { f: 523, d: 0.45 }, { f: 493, d: 0.8 },
@@ -429,19 +472,22 @@
       }
     }
 
+    /* =========================================================================
+       SPRITE TEXTURES & CANVAS SETUP
+       ========================================================================= */
     const monsterImages = {
       dude: new Image(),
       pink: new Image(),
       owlet: new Image()
     };
     monsterImages.dude.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDE0IDc5LjE1Njc5NywgMjAxNC8wOC8yMC0wOTo1MzowMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjUxREU3MjUyQjA5QjExRTk4Q0YzQUMzRjk2NDFCQkIwIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjUxREU3MjUzQjA5QjExRTk4Q0YzQUMzRjk2NDFCQkIwIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NTFERTcyNTBCMDlCMTFFOThDRjNBQzNGOTY0MUJCQjAiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NTFERTcyNTFCMDlCMTFFOThDRjNBQzNGOTY0MUJCQjAiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6PP5J2AAAAGFBMVEXDJC/8/v7nMzsDOWsP7/sGltsEGT8AAAAC4zXKAAAACHRSTlP/////////AN6DvVkAAACnSURBVHja1NJLDsMwCARQbMz4/jeuIbjyBxSpu7KdJwUmpv4y9H8AOjkAWmsiO1mAxiqYEQLPG7AJOnMDi9gAdAvRb9zgyUvBAGPNgh+BfsMAQtA8F86A1aBgOeM888wPILZADDpkTtxkB9HME1ArEbEOhf+ChzBDVEOg11efAOApyPPgCvj6RjgB7ARxUcyzhPU5XEXZmcmb/Pb8CpJnrwD9Ah8BBgDWgBhKFH6/JwAAAABJRU5ErkJggg==';
-    monsterImages.pink.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDE0IDc5LjE1Njc5NywgMjAxNC8wOC8yMC0wOTo1MzowMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjg0NTRGMzc3QUYwNjExRTlBOUUxOTA3OUI2Q0JFODJGIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjg0NTRGMzc4QUYwNjExRTlBOUUxOTA3OUI2Q0JFODJGIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6ODQ1NEYzNzVBRjA2MTFFOUE5RTE5MDc5QjZDQkU4MkYiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6ODQ1NEYzNzZBRjA2MTFFOUE5RTE5MDc5QjZDQkU4MkYiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4zBz29AAAAElBMVEXYQPt4C/f8/v4EGT/0ifYAAADNRSILAAAABnRSTlP//////wCzv6S/AAAAoUlEQVR42ryTQRYDIQhDg6H3v3JFxtdBwenrolnoIl9EQLwehL8C5H3bAaqaRRGmQPeN6P4JUBoQiHCFoqsGMGIMhNkV7jvBMoc2dA+BEKBdygD3STZbP0QEzKat/B3gcJkAmESRw8zyEqtCoXzmrNTWjBXQeH7NQXStdAq0DHAfh2Z9AwgO7bZpBbxUwvyZ5m8Tt9bhaaodYPmzso/zFmAA/mEQYB77AUIAAAAASUVORK5CYII=';
+    monsterImages.pink.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDE0IDc5LjE1Njc5NywgMjAxNC8wOC8yMC0wOTo1MzowMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjg0NTRGMzc3QUYwNjExRTkBOUUxOTA3OUI2Q0JFODJGIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjg0NTRGMzc4QUYwNjExRTkBOUUxOTA3OUI2Q0JFODJGIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6ODQ1NEYzNzVBRjA2MTFFOUE5RTE5MDc5QjZDQkU4MkYiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6ODQ1NEYzNzZBRjA2MTFFOUE5RTE5MDc5QjZDQkU4MkYiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4zBz29AAAAElBMVEXYQPt4C/f8/v4EGT/0ifYAAADNRSILAAAABnRSTlP//////wCzv6S/AAAAoUlEQVR42ryTQRYDIQhDg6H3v3JFxtdBwenrolnoIl9EQLwehL8C5H3bAaqaRRGmQPeN6P4JUBoQiHCFoqsGMGIMhNkV7jvBMoc2dA+BEKBdygD3STZbP0QEzKat/B3gcJkAmESRw8zyEqtCoXzmrNTWjBXQeH7NQXStdAq0DHAfh2Z9AwgO7bZpBbxUwvyZ5m8Tt9bhaaodYPmzso/zFmAA/mEQYB77AUIAAAAASUVORK5CYII=';
     monsterImages.owlet.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMDE0IDc5LjE1Njc5NywgMjAxNC8wOC8yMC0wOTo1MzowMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTQgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjMzMEUzMzNBQjA0QjExRTk5NzI1RjAwNjhDMEVCMzMzIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjMzMEUzMzNCQjA0QjExRTk5NzI1RjAwNjhDMEVCMzMzIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MzMwRTMzMzhCMDRCMTFFOTk3MjVGMDA2OEMwRUIzMzMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6MzMwRTMzMzlCMDRCMTFFOTk3MjVGMDA2OEMwRUIzMzMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4pPpygAAAAHlBMVEVeLCkcEhv9ohYcGjD8UAOUoLoqME5mcpH8/v4AAAAD02/MAAAACnRSTlP///////////8AsswszwAAAKpJREFUeNrU0kkWxCAIBFCMTWHuf+GGaDtE1HWzrf8MQ+g+FP0dwFNLACQrHgm9YhMMB+RYcvWCnFxkAuV5i/AAjKDL8zNpBL/2NIlLIAXEKCFIbF1Q2Y+0HoOKEZjhE+jGBByQhTiLmDepq/ZAndVu4axaJyHy8r5JJi2NmZa3KGg+Vvt+Sp/rmpvMMx4AduC5Btcp+99h3oOtSTYA/i9XAW5sgQZv8BVgAPVpICDQIbToAAAAAElFTkSuQmCC';
 
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    const CW = 800;
-    const CH = 450;
+    const CW = 580;
+    const CH = 520;
 
     let currentLevel = 1;
     let animFrameCount = 0;
@@ -451,53 +497,534 @@
 
     const keys = { left: false, right: false, jump: false };
 
-    // Playable character: Pink Monster (Leslie)
+    // Playable Character (Pink Monster - Leslie)
     const player = {
-      x: 70,
-      y: 330,
-      w: 32,
-      h: 34,
+      x: 50,
+      y: 382,
+      w: 44,
+      h: 48,
       vx: 0,
       vy: 0,
-      speed: 4.2,
-      jumpForce: -11.6,
-      gravity: 0.55,
+      speed: 4.6,
+      jumpForce: -12.4,
+      gravity: 0.62,
       onGround: false,
       facing: 'right',
       animState: 'idle'
     };
 
+    // Stars
+    const STARS = [
+      { x: 35, y: 35, size: 2, type: 'cross', speed: 0.05 },
+      { x: 75, y: 70, size: 1, type: 'dot', speed: 0.07 },
+      { x: 120, y: 25, size: 3, type: 'cross', speed: 0.04 },
+      { x: 165, y: 85, size: 1, type: 'dot', speed: 0.06 },
+      { x: 215, y: 40, size: 2, type: 'cross', speed: 0.08 },
+      { x: 260, y: 95, size: 1, type: 'dot', speed: 0.05 },
+      { x: 310, y: 30, size: 2, type: 'cross', speed: 0.04 },
+      { x: 355, y: 75, size: 1, type: 'dot', speed: 0.09 },
+      { x: 400, y: 45, size: 3, type: 'cross', speed: 0.06 },
+      { x: 445, y: 85, size: 1, type: 'dot', speed: 0.07 },
+      { x: 490, y: 30, size: 2, type: 'cross', speed: 0.05 },
+      { x: 535, y: 65, size: 1, type: 'dot', speed: 0.08 },
+      { x: 560, y: 110, size: 2, type: 'cross', speed: 0.06 },
+      { x: 90, y: 130, size: 1, type: 'dot', speed: 0.05 },
+      { x: 230, y: 140, size: 1, type: 'dot', speed: 0.07 },
+      { x: 380, y: 135, size: 2, type: 'cross', speed: 0.04 },
+      { x: 505, y: 140, size: 1, type: 'dot', speed: 0.06 },
+    ];
+
+    /* =========================================================================
+       SCENERY PROCEDURAL FUNCTIONS
+       ========================================================================= */
+    function drawNightSky(width, height, frame, hazardGlow) {
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, height * 0.85);
+      skyGrad.addColorStop(0.0, '#0a0218');
+      skyGrad.addColorStop(0.35, '#1e0838');
+      skyGrad.addColorStop(0.65, '#3b0764');
+      skyGrad.addColorStop(0.88, '#6b21a8');
+      skyGrad.addColorStop(1.0, hazardGlow ? '#991b1b' : '#9d174d');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Stars
+      for (let i = 0; i < STARS.length; i++) {
+        const s = STARS[i];
+        const shimmer = Math.sin(frame * s.speed + i) * 0.35 + 0.65;
+        ctx.fillStyle = `rgba(255, 255, 255, ${shimmer.toFixed(2)})`;
+        if (s.type === 'cross' && s.size >= 2) {
+          ctx.fillRect(s.x, s.y - 1, 1, 3);
+          ctx.fillRect(s.x - 1, s.y, 3, 1);
+        } else {
+          ctx.fillRect(s.x, s.y, s.size, s.size);
+        }
+      }
+
+      // Shooting star
+      const cometFrame = frame % 240;
+      if (cometFrame < 45) {
+        const progress = cometFrame / 45;
+        const startX = width * 0.82;
+        const startY = height * 0.15;
+        const travel = progress * 160;
+        const curX = startX - travel * 0.85;
+        const curY = startY + travel * 0.52;
+        const tailLen = Math.min(progress * 48, 48);
+
+        const tailGrad = ctx.createLinearGradient(curX, curY, curX + tailLen * 0.85, curY - tailLen * 0.52);
+        tailGrad.addColorStop(0, '#ffffff');
+        tailGrad.addColorStop(0.2, '#c084fc');
+        tailGrad.addColorStop(1, 'rgba(192, 132, 252, 0)');
+
+        ctx.strokeStyle = tailGrad;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(curX, curY);
+        ctx.lineTo(curX + tailLen * 0.85, curY - tailLen * 0.52);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(curX - 1, curY - 1, 3, 3);
+      }
+    }
+
+    function drawMountainRanges(width, baseY) {
+      // Layer 1: Distant silhouette
+      ctx.fillStyle = '#1e0838';
+      ctx.beginPath();
+      ctx.moveTo(0, baseY);
+      ctx.lineTo(0, baseY - 90);
+      ctx.lineTo(45, baseY - 125);
+      ctx.lineTo(105, baseY - 85);
+      ctx.lineTo(175, baseY - 145);
+      ctx.lineTo(250, baseY - 95);
+      ctx.lineTo(320, baseY - 140);
+      ctx.lineTo(395, baseY - 90);
+      ctx.lineTo(470, baseY - 155);
+      ctx.lineTo(540, baseY - 110);
+      ctx.lineTo(width, baseY - 130);
+      ctx.lineTo(width, baseY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Layer 2: Midground peaks
+      ctx.fillStyle = '#2c0c4d';
+      ctx.beginPath();
+      ctx.moveTo(0, baseY);
+      ctx.lineTo(0, baseY - 70);
+      ctx.lineTo(35, baseY - 95);
+      ctx.lineTo(75, baseY - 65);
+      ctx.lineTo(140, baseY - 110);
+      ctx.lineTo(205, baseY - 60);
+      ctx.lineTo(285, baseY - 105);
+      ctx.lineTo(360, baseY - 65);
+      ctx.lineTo(430, baseY - 115);
+      ctx.lineTo(500, baseY - 75);
+      ctx.lineTo(width, baseY - 85);
+      ctx.lineTo(width, baseY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Ridge slope highlights
+      ctx.fillStyle = '#4c1d95';
+      const peaks = [
+        { x1: 0, y1: baseY - 70, x2: 35, y2: baseY - 95 },
+        { x1: 75, y1: baseY - 65, x2: 140, y2: baseY - 110 },
+        { x1: 205, y1: baseY - 60, x2: 285, y2: baseY - 105 },
+        { x1: 360, y1: baseY - 65, x2: 430, y2: baseY - 115 },
+      ];
+      for (const p of peaks) {
+        ctx.beginPath();
+        ctx.moveTo(p.x1, p.y1);
+        ctx.lineTo(p.x2, p.y2);
+        ctx.lineTo(p.x2, baseY);
+        ctx.lineTo(p.x1, baseY);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    function drawPineForest(width, baseY) {
+      ctx.fillStyle = '#120524';
+      const treeSpacing = 16;
+      const numTrees = Math.ceil(width / treeSpacing) + 2;
+      for (let i = 0; i < numTrees; i++) {
+        const tx = i * treeSpacing - 6;
+        const treeHeight = 28 + (i % 3) * 6 + (i % 5) * 4;
+        const topY = baseY - treeHeight;
+        ctx.beginPath();
+        ctx.moveTo(tx, baseY);
+        ctx.lineTo(tx + 8, topY);
+        ctx.lineTo(tx + 16, baseY);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    function drawPixelGround(x, y, w, h, hasFlowers) {
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+
+      // Rock base
+      ctx.fillStyle = '#261208';
+      ctx.fillRect(x, y + 14, w, h - 14);
+
+      // Dirt blocks
+      const tileSize = 16;
+      for (let px = x; px < x + w; px += tileSize) {
+        for (let py = y + 16; py < y + h; py += tileSize) {
+          const isOdd = Math.floor((px - x) / tileSize + (py - y) / tileSize) % 2 === 0;
+          ctx.fillStyle = isOdd ? '#4a2510' : '#381c0c';
+          ctx.fillRect(px + 1, py + 1, Math.min(tileSize - 2, x + w - px - 1), Math.min(tileSize - 2, y + h - py - 1));
+          if (isOdd) {
+            ctx.fillStyle = '#261208';
+            ctx.fillRect(px + 4, py + 4, 3, 3);
+          }
+        }
+      }
+
+      // Dirt-grass edge
+      ctx.fillStyle = '#155e2d';
+      ctx.fillRect(x, y + 10, w, 5);
+
+      // Lush green grass
+      ctx.fillStyle = '#16a34a';
+      ctx.fillRect(x, y + 2, w, 10);
+      ctx.fillStyle = '#22c55e';
+      ctx.fillRect(x, y, w, 4);
+
+      // Neon grass tips
+      ctx.fillStyle = '#4ade80';
+      for (let gx = x; gx < x + w; gx += 6) {
+        const bladeH = (gx % 12 === 0) ? 5 : 3;
+        ctx.fillRect(gx, y - bladeH + 2, 3, bladeH);
+      }
+
+      // Overhang fringe
+      ctx.fillStyle = '#16a34a';
+      for (let gx = x + 3; gx < x + w - 4; gx += 8) {
+        ctx.fillRect(gx, y + 12, 3, 4);
+        ctx.fillRect(gx + 1, y + 16, 2, 2);
+      }
+
+      // Flowers & pebbles
+      if (hasFlowers) {
+        const flowerOffsets = [24, 78, 140, 210, 360, 440, 510];
+        for (let i = 0; i < flowerOffsets.length; i++) {
+          const fx = x + flowerOffsets[i];
+          if (fx < x + w - 10) {
+            const isPurple = i % 2 === 0;
+            ctx.fillStyle = isPurple ? '#c084fc' : '#facc15';
+            ctx.fillRect(fx, y - 5, 4, 4);
+            ctx.fillStyle = isPurple ? '#ffffff' : '#f97316';
+            ctx.fillRect(fx + 1, y - 4, 2, 2);
+            ctx.fillStyle = '#15803d';
+            ctx.fillRect(fx + 1, y - 1, 2, 3);
+          }
+        }
+        const rockOffsets = [110, 305, 480];
+        for (const rx of rockOffsets) {
+          if (x + rx < x + w - 12) {
+            ctx.fillStyle = '#64748b';
+            ctx.fillRect(x + rx, y - 3, 8, 4);
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(x + rx + 1, y - 4, 5, 2);
+          }
+        }
+      }
+
+      ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(x, y, w, h);
+      ctx.restore();
+    }
+
+    function drawDoor(door, frame) {
+      ctx.save();
+      ctx.translate(door.x, door.y);
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(-3, 0, door.w + 6, door.h);
+      ctx.beginPath();
+      ctx.arc(door.w / 2, 8, (door.w + 6) / 2, Math.PI, 0);
+      ctx.fill();
+
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(0, 4, door.w, door.h - 4);
+
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.arc(9, door.h * 0.55, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      const pulse = Math.sin(frame * 0.1) * 0.3 + 0.7;
+      ctx.fillStyle = 'rgba(56, 189, 248, ' + (0.4 * pulse) + ')';
+      ctx.fillRect(2, door.h - 4, door.w - 4, 4);
+      ctx.restore();
+    }
+
+    /* =========================================================================
+       ANIMATED CHEST (OPENS WITH LID, GLOW & SPARKLES)
+       ========================================================================= */
+    function drawChest(chest, isOpen, frame) {
+      ctx.save();
+      ctx.translate(chest.x, chest.y);
+
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.beginPath();
+      ctx.ellipse(chest.w / 2, chest.h + 2, chest.w * 0.55, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Base box (Wood + Gold trim)
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(2, chest.h * 0.4, chest.w - 4, chest.h * 0.6);
+
+      ctx.fillStyle = '#92400e';
+      ctx.fillRect(4, chest.h * 0.45, chest.w - 8, chest.h * 0.5);
+
+      // Gold trim
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(2, chest.h * 0.4, 4, chest.h * 0.6);
+      ctx.fillRect(chest.w - 6, chest.h * 0.4, 4, chest.h * 0.6);
+      ctx.fillRect(2, chest.h - 4, chest.w - 4, 4);
+
+      if (!isOpen) {
+        // Closed lid
+        ctx.fillStyle = '#b45309';
+        ctx.fillRect(0, chest.h * 0.1, chest.w, chest.h * 0.35);
+
+        ctx.beginPath();
+        ctx.arc(chest.w / 2, chest.h * 0.25, chest.w * 0.48, Math.PI, 0);
+        ctx.fill();
+
+        // Lock
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(chest.w / 2 - 4, chest.h * 0.38, 8, 10);
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(chest.w / 2 - 1.5, chest.h * 0.42, 3, 4);
+
+        // Pulse border
+        const pulse = (Math.sin(frame * 0.08) + 1) * 0.5;
+        ctx.strokeStyle = `rgba(251, 191, 36, ${0.4 + pulse * 0.4})`;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-2, chest.h * 0.08, chest.w + 4, chest.h * 0.94);
+      } else {
+        // Open lid swung open
+        ctx.fillStyle = '#92400e';
+        ctx.beginPath();
+        ctx.moveTo(0, chest.h * 0.4);
+        ctx.lineTo(chest.w, chest.h * 0.4);
+        ctx.lineTo(chest.w - 4, -chest.h * 0.25);
+        ctx.lineTo(4, -chest.h * 0.25);
+        ctx.closePath();
+        ctx.fill();
+
+        // Golden radial glow
+        const glowGradient = ctx.createRadialGradient(chest.w / 2, chest.h * 0.3, 2, chest.w / 2, chest.h * 0.3, 40);
+        glowGradient.addColorStop(0, 'rgba(253, 224, 71, 0.9)');
+        glowGradient.addColorStop(0.5, 'rgba(251, 191, 36, 0.4)');
+        glowGradient.addColorStop(1, 'rgba(251, 191, 36, 0)');
+        ctx.fillStyle = glowGradient;
+        ctx.beginPath();
+        ctx.arc(chest.w / 2, chest.h * 0.3, 45, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Glittering stars rising
+        for (let i = 0; i < 4; i++) {
+          const starOffset = (frame * 1.5 + i * 25) % 60;
+          const starX = chest.w / 2 + Math.sin(i * 1.5 + frame * 0.05) * 16;
+          const starY = chest.h * 0.3 - starOffset * 0.7;
+          const starAlpha = Math.max(0, 1 - starOffset / 55);
+
+          ctx.fillStyle = `rgba(254, 240, 138, ${starAlpha})`;
+          ctx.fillRect(starX - 2, starY - 2, 4, 4);
+          ctx.fillRect(starX - 4, starY - 1, 8, 2);
+          ctx.fillRect(starX - 1, starY - 4, 2, 8);
+        }
+      }
+
+      ctx.restore();
+    }
+
+    /* =========================================================================
+       SPRITE RENDERING (LESLIE & COMPANIONS DUDE / OWLET)
+       ========================================================================= */
+    function drawMonster(x, y, w, h, charType, facing, animState, frame) {
+      ctx.save();
+      ctx.translate(x + w / 2, y + h);
+
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.32)';
+      ctx.beginPath();
+      ctx.ellipse(0, 2, w * 0.42, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      let bobY = 0;
+      let rot = 0;
+      if (animState === 'idle') {
+        bobY = Math.sin(frame * 0.08) * 1.5;
+      } else if (animState === 'walk') {
+        bobY = Math.abs(Math.sin(frame * 0.22)) * 4;
+        rot = Math.sin(frame * 0.22) * 0.08;
+      } else if (animState === 'jump') {
+        bobY = -3;
+      }
+      ctx.translate(0, -bobY);
+      ctx.rotate(rot);
+
+      if (facing === 'left') {
+        ctx.scale(-1, 1);
+      }
+
+      const img = monsterImages[charType] || monsterImages.pink;
+      if (img && img.complete && img.naturalWidth > 0) {
+        ctx.drawImage(img, -w / 2, -h, w, h);
+      } else {
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath();
+        ctx.roundRect(-w / 2, -h, w, h, 8);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    // Party NPC: placed at top Y (y: 382, h: 48) so bottomY is 430, perfectly aligned with player!
+    function drawPartyNPC(x, y, w, h, charType, frame, dialogue, facing) {
+      ctx.save();
+      const centerX = x + w / 2;
+      const bottomY = y + h;
+
+      ctx.fillStyle = 'rgba(0,0,0,0.32)';
+      ctx.beginPath();
+      ctx.ellipse(centerX, bottomY - 1, w * 0.42, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cheerful upward hop
+      const hop = -Math.abs(Math.sin(frame * 0.25)) * 10;
+      ctx.translate(centerX, bottomY + hop);
+
+      ctx.save();
+      if (facing === 'left') {
+        ctx.scale(-1, 1);
+      }
+      const img = monsterImages[charType];
+      if (img && img.complete && img.naturalWidth > 0) {
+        ctx.drawImage(img, -w / 2, -h, w, h);
+      }
+      ctx.restore();
+
+      // Party Hat
+      ctx.save();
+      const hatBaseY = -h + 2;
+      ctx.fillStyle = charType === 'dude' ? '#38bdf8' : '#ec4899';
+      ctx.beginPath();
+      ctx.moveTo(-10, hatBaseY);
+      ctx.lineTo(0, hatBaseY - 20);
+      ctx.lineTo(10, hatBaseY);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath();
+      ctx.arc(0, hatBaseY - 21, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Balloon (Dude = Yellow, Owlet = Purple)
+      const balloonColor = charType === 'dude' ? '#facc15' : '#a855f7';
+      const bX = facing === 'left' ? -22 : 22;
+      const bY = -h - 24 + Math.sin(frame * 0.08) * 4;
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(facing === 'left' ? -10 : 10, -h * 0.5);
+      ctx.quadraticCurveTo(bX * 0.6, bY * 0.6, bX, bY + 14);
+      ctx.stroke();
+
+      ctx.fillStyle = balloonColor;
+      ctx.beginPath();
+      ctx.ellipse(bX, bY, 12, 16, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.beginPath();
+      ctx.ellipse(bX - 4, bY - 6, 3, 5, -0.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Dialogue bubble
+      if (dialogue) {
+        ctx.font = 'bold 13px "Plus Jakarta Sans", sans-serif';
+        const textWidth = ctx.measureText(dialogue).width;
+        const bw = Math.max(textWidth + 24, 88);
+        const bh = 28;
+        const bx = -bw / 2;
+        const byPos = -h - 50;
+
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.beginPath();
+        ctx.roundRect(bx + 1, byPos + 2, bw, bh, 8);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.roundRect(bx, byPos, bw, bh, 8);
+        ctx.fill();
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(-5, byPos + bh);
+        ctx.lineTo(5, byPos + bh);
+        ctx.lineTo(0, byPos + bh + 5);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#0f172a';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(dialogue, 0, byPos + bh / 2);
+      }
+
+      ctx.restore();
+    }
+
+    /* =========================================================================
+       LEVEL DATA & MANAGEMENT
+       ========================================================================= */
     function getLevelData(lvl) {
       if (lvl === 1) {
         return {
           platforms: [
-            { x: 40, y: 380, w: 720, h: 50, color: '#166534' },
-            { x: 300, y: 290, w: 150, h: 22, color: '#854d0e' }
+            { x: 20, y: 430, w: 540, h: 90, type: 'ground' },
+            { x: 180, y: 320, w: 180, h: 26, type: 'floating' },
           ],
-          door: { x: 700, y: 310, w: 44, h: 70 },
-          spawn: { x: 70, y: 330 },
-          pitY: 460
+          door: { x: 490, y: 335, w: 52, h: 95 },
+          spawn: { x: 50, y: 382 },
+          pitY: 540
         };
       } else if (lvl === 2) {
         return {
           platforms: [
-            { x: 40, y: 360, w: 140, h: 24, color: '#15803d' },
-            { x: 260, y: 280, w: 150, h: 24, color: '#15803d' },
-            { x: 490, y: 220, w: 150, h: 24, color: '#15803d' },
-            { x: 690, y: 190, w: 85, h: 24, color: '#334155' }
+            { x: 20, y: 410, w: 120, h: 100, type: 'floating' },
+            { x: 180, y: 320, w: 140, h: 30, type: 'floating' },
+            { x: 360, y: 230, w: 130, h: 30, type: 'floating' },
+            { x: 480, y: 160, w: 85, h: 30, type: 'goal' },
           ],
-          door: { x: 710, y: 120, w: 44, h: 70 },
-          spawn: { x: 60, y: 310 },
-          pitY: 425
+          door: { x: 495, y: 70, w: 52, h: 90 },
+          spawn: { x: 45, y: 350 },
+          pitY: 480
         };
       } else {
         return {
           platforms: [
-            { x: 40, y: 380, w: 720, h: 50, color: '#78350f' }
+            { x: 20, y: 430, w: 540, h: 90, type: 'ground' },
           ],
-          chest: { x: 376, y: 334, w: 48, h: 46 },
-          spawn: { x: 80, y: 330 },
-          pitY: 460
+          chest: { x: 264, y: 376, w: 52, h: 54 },
+          spawn: { x: 60, y: 382 },
+          pitY: 540
         };
       }
     }
@@ -516,291 +1043,32 @@
       confetti = [];
       messageAlpha = 0;
 
-      document.getElementById('screen-badge').innerText = 'LVL ' + lvl;
       [1, 2, 3].forEach(n => {
         const btn = document.getElementById('btn-lvl-' + n);
         if (btn) btn.classList.toggle('active', n === lvl);
       });
     }
 
+    function restartEntireGame() {
+      setLevel(1);
+    }
+
     function spawnConfetti(count) {
       const colors = ['#f43f5e', '#3b82f6', '#facc15', '#10b981', '#a855f7', '#fb923c', '#ffffff'];
       for (let i = 0; i < count; i++) {
         confetti.push({
-          x: CW / 2 + (Math.random() - 0.5) * 120,
-          y: 310,
-          vx: (Math.random() - 0.5) * 15,
-          vy: -6 - Math.random() * 11,
+          x: Math.random() * CW,
+          y: -20 - Math.random() * 80,
+          vx: (Math.random() - 0.5) * 4,
+          vy: 2 + Math.random() * 4,
           size: 6 + Math.random() * 7,
           color: colors[Math.floor(Math.random() * colors.length)],
           rotation: Math.random() * Math.PI * 2,
-          vRot: (Math.random() - 0.5) * 0.25,
+          vRot: (Math.random() - 0.5) * 0.18,
           life: 0,
-          maxLife: 150 + Math.random() * 100
+          maxLife: 300 + Math.random() * 200
         });
       }
-    }
-
-    // Keyboard controls
-    window.addEventListener('keydown', (e) => {
-      if (soundEnabled) getAudioCtx();
-      if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
-      if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
-      if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
-        keys.jump = true;
-        e.preventDefault();
-      }
-      if (e.code === 'KeyR') setLevel(currentLevel);
-    });
-
-    window.addEventListener('keyup', (e) => {
-      if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
-      if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
-      if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') keys.jump = false;
-    });
-
-    // Touch & Mouse Button binding
-    function bindTouch(id, keyName) {
-      const btn = document.getElementById(id);
-      if (!btn) return;
-      const start = (e) => {
-        e.preventDefault();
-        if (soundEnabled) getAudioCtx();
-        keys[keyName] = true;
-        btn.classList.add('active');
-        if (navigator.vibrate) try { navigator.vibrate(12); } catch(err){}
-      };
-      const end = (e) => {
-        e.preventDefault();
-        keys[keyName] = false;
-        btn.classList.remove('active');
-      };
-      btn.addEventListener('touchstart', start, { passive: false });
-      btn.addEventListener('touchend', end, { passive: false });
-      btn.addEventListener('mousedown', start);
-      btn.addEventListener('mouseup', end);
-      btn.addEventListener('mouseleave', end);
-    }
-
-    bindTouch('btn-left', 'left');
-    bindTouch('btn-right', 'right');
-    bindTouch('btn-jump', 'jump');
-
-    document.getElementById('restart-btn').addEventListener('click', () => setLevel(currentLevel));
-    document.getElementById('sound-btn').addEventListener('click', () => {
-      soundEnabled = !soundEnabled;
-      document.getElementById('sound-btn').innerText = soundEnabled ? '🔊' : '🔇';
-    });
-
-    // Drawing functions
-    function drawMonster(x, y, w, h, id, facing, state, frame) {
-      ctx.save();
-      ctx.imageSmoothingEnabled = false;
-
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.beginPath();
-      ctx.ellipse(x + w / 2, y + h - 1, w * 0.45, 5, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.translate(x + w / 2, y + h);
-      if (facing === 'left') ctx.scale(-1, 1);
-
-      let bobY = 0;
-      let tilt = 0;
-      let sx = 1, sy = 1;
-
-      if (state === 'walk') {
-        bobY = -Math.abs(Math.sin(frame * 0.35)) * 4;
-        tilt = Math.sin(frame * 0.35) * 0.09;
-      } else if (state === 'jump') {
-        sx = 0.88;
-        sy = 1.14;
-        bobY = -2;
-      } else {
-        bobY = Math.sin(frame * 0.08) * 1.5;
-        sy = 1 + Math.sin(frame * 0.08) * 0.03;
-      }
-
-      ctx.translate(0, bobY);
-      ctx.rotate(tilt);
-      ctx.scale(sx, sy);
-
-      const img = monsterImages[id];
-      if (img && img.complete) {
-        ctx.drawImage(img, -w / 2, -h, w, h);
-      } else {
-        ctx.fillStyle = id === 'pink' ? '#ec4899' : '#0284c7';
-        ctx.fillRect(-w / 2, -h, w, h);
-      }
-
-      ctx.restore();
-    }
-
-    function drawPartyNPC(x, y, w, h, id, frame, dialogue, facing) {
-      ctx.save();
-      ctx.imageSmoothingEnabled = false;
-
-      const cx = x + w / 2;
-      const by = y + h;
-
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.beginPath();
-      ctx.ellipse(cx, by - 1, w * 0.45, 5, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      const bounce = -Math.abs(Math.sin(frame * 0.25)) * 9;
-      ctx.translate(cx, by + bounce);
-
-      ctx.save();
-      if (facing === 'left') ctx.scale(-1, 1);
-      const img = monsterImages[id];
-      if (img && img.complete) {
-        ctx.drawImage(img, -w / 2, -h, w, h);
-      }
-
-      // Party Cone Hat
-      ctx.fillStyle = id === 'dude' ? '#0ea5e9' : '#8b5cf6';
-      ctx.beginPath();
-      ctx.moveTo(-6, -h + 4);
-      ctx.lineTo(6, -h + 4);
-      ctx.lineTo(0, -h - 14);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#facc15';
-      ctx.beginPath();
-      ctx.arc(0, -h - 15, 3.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-
-      // Floating Balloons
-      const balloonOffset = facing === 'left' ? 18 : -18;
-      const stringWiggle = Math.sin(frame * 0.06) * 4;
-      const bX = balloonOffset + stringWiggle;
-      const bY = -h - 38 + Math.cos(frame * 0.05) * 3;
-
-      ctx.strokeStyle = 'rgba(255,255,255,0.7)';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.moveTo(facing === 'left' ? 8 : -8, -h + 12);
-      ctx.lineTo(bX, bY + 8);
-      ctx.stroke();
-
-      ctx.fillStyle = facing === 'left' ? '#06b6d4' : '#f43f5e';
-      ctx.beginPath();
-      ctx.ellipse(bX - 6, bY - 6, 8, 11, -0.1, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = facing === 'left' ? '#a855f7' : '#facc15';
-      ctx.beginPath();
-      ctx.ellipse(bX + 6, bY - 12, 8, 11, 0.15, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Speech bubble
-      if (dialogue) {
-        ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
-        const textWidth = ctx.measureText(dialogue).width;
-        const bw = Math.max(textWidth + 24, 82);
-        const bh = 26;
-        const bx = -bw / 2;
-        const byPos = -h - 44;
-
-        ctx.fillStyle = 'rgba(0,0,0,0.2)';
-        ctx.beginPath();
-        ctx.roundRect(bx + 1, byPos + 2, bw, bh, 8);
-        ctx.fill();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.roundRect(bx, byPos, bw, bh, 8);
-        ctx.fill();
-        ctx.strokeStyle = '#cbd5e1';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(-4, byPos + bh);
-        ctx.lineTo(4, byPos + bh);
-        ctx.lineTo(0, byPos + bh + 5);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.fillStyle = '#0f172a';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(dialogue, 0, byPos + bh / 2);
-      }
-
-      ctx.restore();
-    }
-
-    function drawChest(chest, frame) {
-      ctx.save();
-      ctx.translate(chest.x, chest.y);
-
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.beginPath();
-      ctx.ellipse(chest.w / 2, chest.h + 2, chest.w * 0.55, 6, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#78350f';
-      ctx.fillRect(2, chest.h * 0.4, chest.w - 4, chest.h * 0.6);
-      ctx.fillStyle = '#f59e0b';
-      ctx.fillRect(2, chest.h * 0.4, 4, chest.h * 0.6);
-      ctx.fillRect(chest.w - 6, chest.h * 0.4, 4, chest.h * 0.6);
-      ctx.fillRect(2, chest.h - 4, chest.w - 4, 4);
-
-      if (!isChestOpened) {
-        ctx.fillStyle = '#b45309';
-        ctx.fillRect(0, chest.h * 0.1, chest.w, chest.h * 0.35);
-        ctx.beginPath();
-        ctx.arc(chest.w / 2, chest.h * 0.25, chest.w * 0.48, Math.PI, 0);
-        ctx.fill();
-        ctx.fillStyle = '#fbbf24';
-        ctx.fillRect(chest.w / 2 - 4, chest.h * 0.38, 8, 10);
-      } else {
-        ctx.fillStyle = '#92400e';
-        ctx.beginPath();
-        ctx.moveTo(0, chest.h * 0.4);
-        ctx.lineTo(chest.w, chest.h * 0.4);
-        ctx.lineTo(chest.w - 4, -chest.h * 0.25);
-        ctx.lineTo(4, -chest.h * 0.25);
-        ctx.closePath();
-        ctx.fill();
-
-        const glow = ctx.createRadialGradient(chest.w/2, chest.h*0.3, 2, chest.w/2, chest.h*0.3, 35);
-        glow.addColorStop(0, 'rgba(253, 224, 71, 0.9)');
-        glow.addColorStop(1, 'rgba(251, 191, 36, 0)');
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(chest.w / 2, chest.h * 0.3, 35, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      ctx.restore();
-    }
-
-    function drawDoor(door, frame) {
-      ctx.save();
-      ctx.translate(door.x, door.y);
-      ctx.fillStyle = '#475569';
-      ctx.fillRect(-3, 0, door.w + 6, door.h);
-      ctx.beginPath();
-      ctx.arc(door.w / 2, 6, (door.w + 6) / 2, Math.PI, 0);
-      ctx.fill();
-
-      ctx.fillStyle = '#78350f';
-      ctx.fillRect(0, 4, door.w, door.h - 4);
-
-      ctx.fillStyle = '#fbbf24';
-      ctx.beginPath();
-      ctx.arc(8, door.h * 0.55, 3.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      const pulse = Math.sin(frame * 0.1) * 0.3 + 0.7;
-      ctx.fillStyle = 'rgba(56, 189, 248, ' + (0.4 * pulse) + ')';
-      ctx.fillRect(2, door.h - 4, door.w - 4, 4);
-
-      ctx.restore();
     }
 
     function update() {
@@ -826,8 +1094,8 @@
       player.x += player.vx;
       player.y += player.vy;
 
-      if (player.x < 10) player.x = 10;
-      if (player.x + player.w > CW - 10) player.x = CW - 10 - player.w;
+      if (player.x < 15) player.x = 15;
+      if (player.x + player.w > CW - 15) player.x = CW - 15 - player.w;
 
       player.onGround = false;
       for (const plat of levelData.platforms) {
@@ -835,7 +1103,7 @@
           player.x + player.w > plat.x &&
           player.x < plat.x + plat.w &&
           player.y + player.h >= plat.y &&
-          player.y + player.h <= plat.y + 14 &&
+          player.y + player.h <= plat.y + 16 &&
           player.vy >= 0
         ) {
           player.y = plat.y - player.h;
@@ -875,7 +1143,7 @@
         }
       }
 
-      // Chest Collision (Level 3 - Reveal Dude and Owlet!)
+      // Chest Collision (Level 3 - Opens only upon contact!)
       if (currentLevel === 3 && levelData.chest && !isChestOpened) {
         const c = levelData.chest;
         if (
@@ -886,14 +1154,15 @@
         ) {
           isChestOpened = true;
           playSound('chest');
-          playSound('voice');
+          playSound('congratulations');
           setTimeout(() => {
             playSound('birthday');
-          }, 350);
-          spawnConfetti(240);
+          }, 900);
+          spawnConfetti(260);
         }
       }
 
+      // Update Confetti
       for (let i = confetti.length - 1; i >= 0; i--) {
         const p = confetti[i];
         p.vy += 0.1;
@@ -901,11 +1170,11 @@
         p.y += p.vy;
         p.rotation += p.vRot;
         p.life++;
-        if (p.life > p.maxLife || p.y > CH + 40) {
-          if (isChestOpened && Math.random() < 0.25) {
+        if (p.life > p.maxLife || p.y > CH + 30) {
+          if (isChestOpened && Math.random() < 0.28) {
             p.y = -20;
             p.x = Math.random() * CW;
-            p.vy = 2 + Math.random() * 3;
+            p.vy = 2 + Math.random() * 3.5;
             p.life = 0;
           } else {
             confetti.splice(i, 1);
@@ -921,94 +1190,58 @@
     function render() {
       ctx.clearRect(0, 0, CW, CH);
 
-      // Backgrounds
-      if (currentLevel === 1) {
-        const bgGrad = ctx.createLinearGradient(0, 0, 0, CH);
-        bgGrad.addColorStop(0, '#0f172a');
-        bgGrad.addColorStop(0.7, '#1e293b');
-        bgGrad.addColorStop(1, '#090d16');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, CW, CH);
+      // Scenery
+      const isLavaLevel = currentLevel === 2;
+      drawNightSky(CW, CH, animFrameCount, isLavaLevel);
 
-        ctx.fillStyle = 'rgba(255,255,255,0.06)';
-        ctx.beginPath();
-        ctx.arc(140, 110, 50, 0, Math.PI * 2);
-        ctx.arc(180, 95, 60, 0, Math.PI * 2);
-        ctx.arc(230, 110, 45, 0, Math.PI * 2);
-        ctx.fill();
-      } else if (currentLevel === 2) {
-        const bgGrad = ctx.createLinearGradient(0, 0, 0, CH);
-        bgGrad.addColorStop(0, '#180d24');
-        bgGrad.addColorStop(0.7, '#2e1065');
-        bgGrad.addColorStop(1, '#450a0a');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, CW, CH);
+      const horizonY = currentLevel === 2 ? 400 : 430;
+      drawMountainRanges(CW, horizonY);
+      drawPineForest(CW, horizonY);
 
-        const pitGradient = ctx.createLinearGradient(0, 385, 0, CH);
-        pitGradient.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
-        pitGradient.addColorStop(0.4, 'rgba(220, 38, 38, 0.7)');
+      // Lava glow in Level 2
+      if (isLavaLevel) {
+        const pitGradient = ctx.createLinearGradient(0, 440, 0, CH);
+        pitGradient.addColorStop(0, 'rgba(239, 68, 68, 0.25)');
+        pitGradient.addColorStop(0.4, 'rgba(220, 38, 38, 0.75)');
         pitGradient.addColorStop(1, '#7f1d1d');
         ctx.fillStyle = pitGradient;
-        ctx.fillRect(0, 385, CW, CH - 385);
+        ctx.fillRect(0, 440, CW, CH - 440);
 
         ctx.fillStyle = '#ef4444';
-        for (let x = 10; x < CW; x += 28) {
+        for (let x = 10; x < CW; x += 26) {
           ctx.beginPath();
           ctx.moveTo(x, CH);
-          ctx.lineTo(x + 14, CH - 26);
-          ctx.lineTo(x + 28, CH);
-          ctx.fill();
-        }
-      } else {
-        const bgGrad = ctx.createLinearGradient(0, 0, 0, CH);
-        bgGrad.addColorStop(0, '#1e1b4b');
-        bgGrad.addColorStop(0.6, '#312e81');
-        bgGrad.addColorStop(1, '#1e1136');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, CW, CH);
-
-        const colors = ['#f43f5e', '#3b82f6', '#facc15', '#10b981', '#a855f7', '#fb923c'];
-        for (let i = 0; i < 17; i++) {
-          const gx = 45 + i * 42;
-          const gy = 34 + Math.sin((i / 16) * Math.PI) * 12;
-          ctx.fillStyle = colors[i % colors.length];
-          ctx.beginPath();
-          ctx.moveTo(gx, gy);
-          ctx.lineTo(gx + 32, gy);
-          ctx.lineTo(gx + 16, gy + 28);
-          ctx.closePath();
+          ctx.lineTo(x + 13, CH - 28);
+          ctx.lineTo(x + 26, CH);
           ctx.fill();
         }
       }
 
-      // Platforms
+      // Platforms with pixel grass and earth
       for (const plat of levelData.platforms) {
-        ctx.fillStyle = plat.color;
-        ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
-        ctx.fillStyle = 'rgba(255,255,255,0.22)';
-        ctx.fillRect(plat.x, plat.y, plat.w, 4);
-        ctx.fillStyle = 'rgba(0,0,0,0.35)';
-        ctx.fillRect(plat.x, plat.y + plat.h - 4, plat.w, 4);
+        drawPixelGround(plat.x, plat.y, plat.w, plat.h, plat.type === 'ground', animFrameCount);
       }
 
-      // Door (Levels 1 & 2)
+      // Doors in Level 1 & 2
       if (levelData.door) {
         drawDoor(levelData.door, animFrameCount);
       }
 
-      // Level 3: Dude and Owlet appear ONLY upon touching chest!
+      // Level 3: Animated Chest & Companions Dude and Owlet
       if (currentLevel === 3) {
-        if (isChestOpened) {
-          drawPartyNPC(230, 346, 32, 34, 'dude', animFrameCount, '¡Sorpresa!', 'right');
-          drawPartyNPC(530, 346, 32, 34, 'owlet', animFrameCount, '¡Feliz Cumple!', 'left');
+        if (levelData.chest) {
+          drawChest(levelData.chest, isChestOpened, animFrameCount);
         }
 
-        if (levelData.chest) {
-          drawChest(levelData.chest, animFrameCount);
+        // Two Monster NPCs appear celebrating ONLY when chest is opened!
+        // Both placed at y: 382 so their feet are on the ground at y: 430, perfectly aligned with player!
+        if (isChestOpened) {
+          drawPartyNPC(130, 382, 44, 48, 'dude', animFrameCount, '¡Sorpresa!', 'right');
+          drawPartyNPC(406, 382, 44, 48, 'owlet', animFrameCount, '¡Feliz Cumple!', 'left');
         }
       }
 
-      // Draw Player Monster (Pink Monster - Leslie)
+      // Player Monster (Leslie)
       drawMonster(
         player.x,
         player.y,
@@ -1033,104 +1266,211 @@
       // HUD & Instructions
       ctx.textAlign = 'center';
       if (currentLevel === 1) {
-        ctx.font = '10px "Press Start 2P", monospace';
-        ctx.fillStyle = '#050811';
-        ctx.fillText('Usa ◀ ▶ para moverte y ▲ / ESPACIO para saltar', CW / 2 + 1, 61);
+        // LVL 1 Badge
+        ctx.fillStyle = '#1e0838';
+        ctx.beginPath();
+        ctx.roundRect(35, 25, 75, 28, 8);
+        ctx.fill();
+        ctx.strokeStyle = '#8b5cf6';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.fillStyle = '#fde047';
+        ctx.font = 'bold 10px "Press Start 2P", monospace';
+        ctx.fillText('LVL 1', 72, 43);
+
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = 'bold 13px "Press Start 2P", monospace';
+        ctx.fillText('NIVEL 1: TUTORIAL 🌲', 122, 44);
+
+        ctx.textAlign = 'center';
         ctx.fillStyle = '#f8fafc';
-        ctx.fillText('Usa ◀ ▶ para moverte y ▲ / ESPACIO para saltar', CW / 2, 60);
-
-        ctx.font = '8px "Press Start 2P", monospace';
-        ctx.fillStyle = '#050811';
-        ctx.fillText('▶ Llega a la puerta dorada de la derecha ▶', CW / 2 + 1, 89);
+        ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('Usa ◀ ▶ para moverte y ▲ para saltar', CW / 2, 78);
         ctx.fillStyle = '#38bdf8';
-        ctx.fillText('▶ Llega a la puerta dorada de la derecha ▶', CW / 2, 88);
+        ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('▶ Entra por la puerta para avanzar de nivel ▶', CW / 2, 98);
       } else if (currentLevel === 2) {
-        ctx.font = '10px "Press Start 2P", monospace';
-        ctx.fillStyle = '#050811';
-        ctx.fillText('¡CUIDADO CON EL FOSO DE LAVA!', CW / 2 + 1, 61);
-        ctx.fillStyle = '#f87171';
-        ctx.fillText('¡CUIDADO CON EL FOSO DE LAVA!', CW / 2, 60);
+        // LVL 2 Badge
+        ctx.fillStyle = '#1e0838';
+        ctx.beginPath();
+        ctx.roundRect(35, 25, 75, 28, 8);
+        ctx.fill();
+        ctx.strokeStyle = '#8b5cf6';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.fillStyle = '#fde047';
+        ctx.font = 'bold 10px "Press Start 2P", monospace';
+        ctx.fillText('LVL 2', 72, 43);
 
-        ctx.font = '8px "Press Start 2P", monospace';
-        ctx.fillStyle = '#050811';
-        ctx.fillText('Salta con precision entre las 3 plataformas', CW / 2 + 1, 85);
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#f87171';
+        ctx.font = 'bold 13px "Press Start 2P", monospace';
+        ctx.fillText('NIVEL 2: DESAFÍO 🔥', 122, 44);
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('¡Cuidado con el foso de lava! Salta con precisión', CW / 2, 78);
         ctx.fillStyle = '#cbd5e1';
-        ctx.fillText('Salta con precision entre las 3 plataformas', CW / 2, 84);
+        ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('Llega a la puerta superior para desbloquear el gran final', CW / 2, 98);
       } else if (currentLevel === 3) {
         if (!isChestOpened) {
-          ctx.font = '11px "Press Start 2P", monospace';
-          ctx.fillStyle = '#050811';
-          ctx.fillText('¡TOCA EL COFRE DORADO EN EL CENTRO!', CW / 2 + 1, 71);
-          ctx.fillStyle = '#facc15';
-          ctx.fillText('¡TOCA EL COFRE DORADO EN EL CENTRO!', CW / 2, 70);
+          // Guidance before opening chest
+          const badgeX = 35;
+          const badgeY = 25;
+          const badgeW = 75;
+          const badgeH = 28;
+          ctx.fillStyle = '#1e0838';
+          ctx.beginPath();
+          ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 8);
+          ctx.fill();
+          ctx.strokeStyle = '#8b5cf6';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
 
-          const bounce = Math.sin(animFrameCount * 0.1) * 6;
+          ctx.fillStyle = '#fde047';
+          ctx.font = 'bold 10px "Press Start 2P", monospace';
+          ctx.fillText('LVL 3', badgeX + badgeW / 2, badgeY + 18);
+
+          ctx.fillStyle = '#fbbf24';
+          ctx.font = 'bold 13px "Press Start 2P", monospace';
+          ctx.textAlign = 'left';
+          ctx.fillText('¡ABRE EL COFRE DORADO! 🎁', badgeX + badgeW + 12, badgeY + 20);
+
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#f8fafc';
+          ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
+          ctx.fillText('Camina hacia el cofre para descubrir la sorpresa', CW / 2, badgeY + 54);
+
+          // Bouncing arrow pointing down to chest
+          const bounce = Math.sin(animFrameCount * 0.12) * 6;
           ctx.fillStyle = '#fbbf24';
           ctx.beginPath();
-          ctx.moveTo(CW / 2, 285 + bounce);
-          ctx.lineTo(CW / 2 - 12, 270 + bounce);
-          ctx.lineTo(CW / 2 + 12, 270 + bounce);
+          ctx.moveTo(CW / 2, 335 + bounce);
+          ctx.lineTo(CW / 2 - 12, 318 + bounce);
+          ctx.lineTo(CW / 2 + 12, 318 + bounce);
           ctx.closePath();
           ctx.fill();
         } else {
-          // CELEBRATION OVERLAY BANNER FOR LESLIE
+          // Birthday Card fades in ONLY after opening chest!
           ctx.save();
           ctx.globalAlpha = messageAlpha;
 
-          const cardW = 690;
-          const cardH = 175;
-          const cardX = CW / 2 - cardW / 2;
-          const cardY = 24;
-
-          ctx.fillStyle = 'rgba(3, 7, 18, 0.95)';
+          const badgeX = 35;
+          const badgeY = 25;
+          const badgeW = 75;
+          const badgeH = 28;
+          ctx.fillStyle = '#1e0838';
           ctx.beginPath();
-          ctx.roundRect(cardX, cardY, cardW, cardH, 14);
+          ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 8);
           ctx.fill();
-
-          ctx.strokeStyle = '#f59e0b';
-          ctx.lineWidth = 3;
+          ctx.strokeStyle = '#8b5cf6';
+          ctx.lineWidth = 1.5;
           ctx.stroke();
 
-          ctx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(cardX + 4, cardY + 4, cardW - 8, cardH - 8);
+          ctx.fillStyle = '#fde047';
+          ctx.font = 'bold 10px "Press Start 2P", monospace';
+          ctx.fillText('LVL 3', badgeX + badgeW / 2, badgeY + 18);
 
           ctx.fillStyle = '#fbbf24';
-          ctx.font = 'bold 17px "Press Start 2P", monospace';
-          ctx.fillText('¡FELIZ CUMPLEAÑOS LESLIE! 🎉', CW / 2, cardY + 36);
+          ctx.font = 'bold 15px "Press Start 2P", monospace';
+          ctx.textAlign = 'left';
+          ctx.fillText('¡FELIZ CUMPLEAÑOS LESLIE! 🎉', badgeX + badgeW + 12, badgeY + 20);
 
+          ctx.textAlign = 'center';
           ctx.fillStyle = '#f8fafc';
-          ctx.font = '600 13px "Plus Jakarta Sans", sans-serif';
-          ctx.fillText(
-            'Leslie, otro nivel desbloqueado en esta aventura que es tu vida.',
-            CW / 2,
-            cardY + 68
-          );
-          ctx.fillText(
-            'Te deseo lo mejor, gracias por ser tan buena amiga, nunca cambies tu forma de ser.',
-            CW / 2,
-            cardY + 92
-          );
+          ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
+          ctx.fillText('Leslie, otro nivel desbloqueado en esta aventura que es tu vida.', CW / 2, badgeY + 54);
+          ctx.fillText('Te deseo lo mejor, gracias por ser tan buena amiga, nunca cambies tu forma de ser.', CW / 2, badgeY + 72);
 
-          ctx.fillStyle = 'rgba(244, 63, 94, 0.2)';
+          const coupW = CW - 70;
+          const coupH = 30;
+          const coupX = 35;
+          const coupY = badgeY + 86;
+
+          ctx.fillStyle = 'rgba(112, 26, 117, 0.35)';
           ctx.beginPath();
-          ctx.roundRect(cardX + 28, cardY + 114, cardW - 56, 38, 8);
+          ctx.roundRect(coupX, coupY, coupW, coupH, 8);
           ctx.fill();
-          ctx.strokeStyle = 'rgba(244, 63, 94, 0.65)';
+          ctx.strokeStyle = 'rgba(216, 70, 239, 0.6)';
           ctx.lineWidth = 1.2;
           ctx.stroke();
 
-          ctx.fillStyle = '#fda4af';
-          ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
-          ctx.fillText(
-            '🎟️ Nota: cupón válido para hacerle una garra del tigre al goldo <3',
-            CW / 2,
-            cardY + 138
-          );
+          ctx.fillStyle = '#f472b6';
+          ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+          ctx.fillText('♥  Nota: cupón válido para hacerle una garra del tigre al goldo <3', CW / 2, coupY + 19);
 
           ctx.restore();
         }
       }
+    }
+
+    /* =========================================================================
+       INPUT EVENT LISTENERS
+       ========================================================================= */
+    window.addEventListener('keydown', (e) => {
+      getAudioCtx();
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+        keys.left = true;
+      } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+        keys.right = true;
+      } else if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+        keys.jump = true;
+      } else if (e.code === 'KeyR') {
+        restartEntireGame();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+        keys.left = false;
+      } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+        keys.right = false;
+      } else if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+        keys.jump = false;
+      }
+    });
+
+    function setupTouch(id, key) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const start = (e) => {
+        e.preventDefault();
+        getAudioCtx();
+        keys[key] = true;
+        el.classList.add('active');
+        if (navigator.vibrate) navigator.vibrate(15);
+      };
+      const stop = (e) => {
+        e.preventDefault();
+        keys[key] = false;
+        el.classList.remove('active');
+      };
+      el.addEventListener('touchstart', start, { passive: false });
+      el.addEventListener('touchend', stop, { passive: false });
+      el.addEventListener('touchcancel', stop, { passive: false });
+      el.addEventListener('mousedown', start);
+      el.addEventListener('mouseup', stop);
+      el.addEventListener('mouseleave', stop);
+    }
+
+    setupTouch('btn-left', 'left');
+    setupTouch('btn-right', 'right');
+    setupTouch('btn-jump', 'jump');
+
+    function downloadSelf() {
+      const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'juego_cumpleanos_leslie.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     function gameLoop() {
